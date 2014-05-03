@@ -11,7 +11,7 @@
             [selmer.parser :as parser]
             [environ.core :refer [env]]
             [jaredbowiev2.models.blog :as blog-models :refer [post-count]]
-            [jaredbowiev2.routes.blog :refer [other-blog-routes]]
+            [jaredbowiev2.routes.blog :refer [blog-routes]]
             [jaredbowiev2.routes.auth :refer [auth-routes]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.middleware.params :refer [wrap-params]]
@@ -64,7 +64,8 @@
            blogadmin-routes
            home-routes
            auth-routes
-           (other-blog-routes (blog-models/post-count) 10)
+           blog-routes
+          ; (other-blog-routes (blog-models/post-count) 10)
            app-routes]
            ;; add custom middleware here
           :middleware [;wrap-params

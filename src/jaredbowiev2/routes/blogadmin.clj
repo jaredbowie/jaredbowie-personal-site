@@ -24,7 +24,7 @@
       [:p]
       [:label {:form "blogpost"} [:font {:class "string"} "\"Post\""]]
       [:textarea {:id "blog-content" :rows "10" :cols "50"}]
-      [:button {:div "save-post-button" :type "button"} "save post"]
+      [:button {:id "save-post-button" :type "button"} "save post"]
       ]]
     [:div {:id "edit-blog-post"}
      [:form
@@ -42,6 +42,6 @@
 (def-restricted-routes blogadmin-routes
   (GET "/add-post" [] (add-post-html))
   ;(POST "/add-post" {params :params} (prn "params:" params))
-  (POST "/add-post" [blog-title blog-content] (blog-models/add-post blog-title blog-content "jared"))
+  (POST "/add-post" [blogpost] (blog-models/add-post-direct blogpost "jared"))
   (GET "/edit-post" {params :params} (blog-models/get-title-and-post-json (params :longdate)))
   )

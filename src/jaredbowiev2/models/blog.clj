@@ -4,7 +4,7 @@
    [clj-time.core :as timecore :refer [now]]
    [clj-time.coerce :as timecoerce :refer [to-long from-long]]
    [clj-time.format :as timeformat :refer [show-formatters formatter unparse]]
-   [clojure.data.json :as json :refer [write-str]]
+   [clojure.data.json :as json :refer [write-str read-str]]
    )
   )
 
@@ -50,17 +50,28 @@
   ((get-post post-name) :post-author)
   )
 
-(defn add-post [title content-string author]
-  (let [time-now (timecore/now)
-        time-long (timecoerce/to-long time-now)
-        ]
-    (wcar* (car/select "3"))
-    (wcar* (car/set time-long {:post-title title :post-content content-string :post-author author}))
-    (str time-long " : " (wcar* (car/get time-long)))
-    )
+(defn add-post-inner [title content-string author time-long]
+  (wcar* (car/select "3"))
+  (wcar* (car/set time-long {:post-title title :post-content content-string :post-author author}))
+  (println (str time-long " : " (wcar* (car/get time-long))))
   )
 
-(defn edit-post [post-name post-new-content])
+(defn add-post-direct [blog-post-json author]
+  (let [blog-post-clojure (json/read-str blog-post-json :key-fn keyword)
+        the-title (blog-post-clojure :title)
+        the-body (blog-post-clojure :body)
+        the-long-date (blog-post-clojure :longdate)
+        ]
+    (println blog-post-clojure)
+    (if (= "" the-long-date)
+       (let [time-now (timecore/now)
+             time-long (timecoerce/to-long time-now)]
+         (add-post-inner the-title the-body author time-long)
+         )
+       (add-post-inner the-title the-body author the-long-date)
+       )
+    )
+  )
 
 (defn delete-post [post-name]
   (wcar* (car/select "3"))
@@ -115,7 +126,7 @@
 
 
 (defn get-title-and-post-json [long-title]
-  (let [map-of-title-post {:post-title (get-post-title long-title) :post-content (get-post-content long-title)}
+  (let [map-of-title-post {:posttitle (get-post-title long-title) :postcontent (get-post-content long-title)}
         json-string (json/write-str map-of-title-post)]
     (println json-string)
     json-string

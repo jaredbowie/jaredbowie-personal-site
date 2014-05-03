@@ -10,13 +10,20 @@
     (blog-layout/blog page-number number-of-posts-to-display posts-data-map))
   )
 
-(defn other-blog-routes
-"post-count being the total amount of posts to display"
-  [post-count number-of-posts-to-display]
-  (let [pages (/ post-count 10)
-        blog-page-numbers (range pages)]
-    (apply routes (map #(GET (str "/blog/" %) [] (blog % number-of-posts-to-display)) blog-page-numbers))
-    ))
+(comment (defn other-blog-routes
+           "post-count being the total amount of posts to display"
+           [post-count number-of-posts-to-display]
+           (let [pages (/ post-count 10)
+                 blog-page-numbers (range pages)]
+             (apply routes (map #(GET (str "/blog/" %) [] (blog % number-of-posts-to-display)) blog-page-numbers))
+             )))
+
+(defroutes blog-routes
+  (GET "/blog/:pagenumber" [pagenumber] (blog (read-string pagenumber) 10))
+  )
+
+
+
 
 (comment (defn one-post-html-hiccup [date-string date-long post-content page-number]
            [:div [:div {:class "left"} [:font {:class "stringdate"} (str date-string "&nbsp;")] [:font {:class "longdate"} (str ";" date-long)]]

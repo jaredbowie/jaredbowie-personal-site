@@ -10,7 +10,7 @@
 (defn one-blog-post [blog-post-title blog-post-date blog-post-author blog-post-content]
   (html [:div {:class "blog-post"}
          [:div {:class "blogleft"}
-          [:p {:class "blog-post-meta"} [:font {:class "stringdate"} blog-post-date] " by " blog-post-author]]
+          [:p {:class "blog-post-meta"} [:font {:class "stringdate"} blog-post-date] [:font {:class "string"} " by "  blog-post-author]]]
          [:div {:class "blogright"}
           [:h2 {:class "blog-post-title"} [:font {:class "string"} blog-post-title]]
           [:p {:class "blog-post-content"} [:font {:class "string"} blog-post-content]]
