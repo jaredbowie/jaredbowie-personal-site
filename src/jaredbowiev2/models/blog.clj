@@ -53,7 +53,10 @@
 (defn add-post-inner [title content-string author time-long]
   (wcar* (car/select "3"))
   (wcar* (car/set time-long {:post-title title :post-content content-string :post-author author}))
-  (println (str time-long " : " (wcar* (car/get time-long))))
+  (let [new-post (str time-long " : " (wcar* (car/get time-long)))]
+    (println new-post)
+    new-post
+    )
   )
 
 (defn add-post-direct [blog-post-json author]

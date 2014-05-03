@@ -11,7 +11,6 @@ $(document).ready(function(){
         var theBody = $('textarea#blog-content').val();
         var theLong = $('textarea#long-data-to-edit').val();
         var checkboxStatus = $('#new-post-check').is(':checked');
-        console.log(checkboxStatus);
         if (theTitle != '' & theBody != '') {
             if (checkboxStatus === false) {
                 if (theLong === '') {
@@ -51,11 +50,11 @@ var addBlogPost = function(title, body, longdate){  /// if no longdate then new
         url: "add-post",
         type: "post",
         //dataType: "text",
-        data: { blogpost: jsonString }
-       /* success: function(r) {
-            //console.log("getBlogPost" + r);
-            httpResponseToTextArea(r);
-        }*/
+        data: { blogpost: jsonString },
+        success: function(r){
+            alert(r);
+            //httpResponseToTextArea(r);
+        }
     });
 };
 
