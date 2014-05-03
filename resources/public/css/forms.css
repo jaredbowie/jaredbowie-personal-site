@@ -1,0 +1,7 @@
+.text_button {
+   border: none;
+   background-color: transparent;
+   padding: 0;
+   text-decoration: underline; /* if desired */
+   color: #00c;  /* or whatever other color you want */
+}

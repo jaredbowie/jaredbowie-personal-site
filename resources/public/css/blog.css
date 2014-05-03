@@ -1,0 +1,27 @@
+div.blogleft { 
+	float:left;
+	width:33%;
+	/*padding:10px;*/
+	/*border:1px solid white;*/
+	vertical-align:text-top;
+}
+div.blogright {
+	float:left;
+	width:66%;
+	/*padding:10px;*/
+	/*border:1px solid white;*/
+}
+/*div.bottomhr {
+	width:920px;
+} */
+font.stringdate {
+	color:#2f6ffc;
+	background-color:#1a1a1a;
+}
+font.longdate {
+	color:#374046;
+	background-color:#1a1a1a;
+}
+#content .blog-post-title {
+	text-align:center;
+}

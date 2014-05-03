@@ -1,0 +1,69 @@
+textarea.notes-japanese-word {
+	width: 150px;
+	height: 30px;
+/*	border: 1px solid #cccccc;*/
+	/*padding: 5px;*/
+	/*font-color: red;*/
+}
+
+textarea.notes-furigana-word {
+	width: 150px;
+	height: 30px;
+/*	border: 1px solid #cccccc;*/
+	/*padding: 5px;*/
+	/*font-color: red;*/
+}
+
+textarea.notes-english-explanation {
+	width: 300px;
+	height: 30px;
+	/*border: 1px solid #cccccc;*/
+/*	padding: 5px;*/
+}
+
+textarea#audio-path {
+    width: 500px;
+    height: 20px;
+}
+
+textarea#paragraph {
+    width: 600px;
+    height: 250px;
+}
+
+
+div.left-label {
+    position: relative;
+    float:left;
+    width:14%;
+    padding-top:20px;
+    /*padding:10px;*/
+  /*  border:1px solid red;*/
+    display: table-cell;
+    vertical-align: middle;
+/*vertical-align:text-top;*/
+}
+
+div.right-label {
+    position: relative;
+    float:right;
+    width:85%;
+    padding-top: 20px;
+    /*padding:10px;*/
+   /* border:1px solid orange;*/
+    vertical-align: bottom;
+}
+
+div.one-input {
+    display: table-row;
+    float: left;
+    clear: both;
+    width: 100%;
+   /* border: 3px solid blue;*/
+}
+
+div#card-creator {
+    height: 500px;
+    width: 97%;
+   /* border:1px solid green;*/
+}
