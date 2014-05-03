@@ -1,6 +1,6 @@
-(defproject jaredbowiev2 "0.1.2-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject jaredbowiev2 "0.1.4-SNAPSHOT"
+  :description "Jared Bowie's Personal site"
+  :url "http://jaredbowie.com/"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [lib-noir "0.8.1"]
                  [compojure "1.1.6"]

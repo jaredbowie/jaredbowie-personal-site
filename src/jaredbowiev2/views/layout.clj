@@ -3,10 +3,10 @@
             [hiccup.core :refer [html]]
             [noir.session :as session]))
 
-;(def domain "http://jaredbowie.com/")
-;(def domainhttps "https://jaredbowie.com/")
-(def domain "http://localhost:3000/")
-(def domainhttps "http://localhost:3000/")
+(def domain "http://jaredbowie.com/")
+(def domainhttps "https://jaredbowie.com/")
+;(def domain "http://localhost:3000/")
+;(def domainhttps "http://localhost:3000/")
 
 (defn convert-to-html [link text]
   (html [:div {:align "left"} [:a {:href link} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} text] [:font {:class "para1"} ")"]]]))

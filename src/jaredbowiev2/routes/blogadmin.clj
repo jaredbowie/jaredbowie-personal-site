@@ -11,7 +11,7 @@
 (defn add-post-html []
   (layout/common
    [:div
-    (include-js "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
+    (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
     (include-js "/js/blogadmin.js")
     [:div
      [:form
