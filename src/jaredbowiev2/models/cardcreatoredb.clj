@@ -21,58 +21,107 @@
   "-display decks to user"
   )
 
-(defn add-new-collection [username]
+
+;;;;;;;;;;;;;;
+;;NEW USER-COLL
+;;;;;;;;;;;;;;
+
+(defn add-new-user-coll-name [user-coll-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (if (mgcoll/exists? username)
+  (if (mgcoll/exists? user-coll-name)
     (println "Username already exists, unable to create")
-    (mgcoll/create username {:max 10000}))
+    (mgcoll/create user-coll-name {:max 10000}))
   )
 
-(defn add-empty-deck-list [username]
-  (mgcoll/insert username {:_id (ObjectId.) :all-decks []})
+(defn add-empty-deck-list [user-coll-name]
+  (mgcoll/insert user-coll-name {:_id (ObjectId.) :all-decks []})
   )
 
-(defn new-card-deck [collection-name deck-name]
+(defn new-user-coll-name [user-coll-name]
+  ;(mgcore/connect!)
+  ;(mgcore/set-db! (mgcore/get-db "card-db"))
+  (add-new-user-coll-name user-coll-name)
+  (add-empty-deck-list user-coll-name)
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;;;End New User-Coll
+;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;
+;;;;Add Delete Edit Deck
+;;;;;;;;;;;;;;;;;;;;;
+
+(defn new-card-deck
+  "the username is the collection name.  each user has a list of decks with a unique id (so that duplicate deck names don't cause a problem"
+; card-db - > username -> {:all-decks [{deck-name "deck1" deck-id "deck-id"}]
+  [user-coll-name deck-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [deck-document (mgcoll/find-one-as-map collection-name {:all-decks {$exists true}})
+  (let [deck-document (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})
         deck-document-id (deck-document :_id)
+        deck-map {:deck-name deck-name :deck-id (ObjectId.)}
         ]
-    (mgcoll/update collection-name {:_id deck-document-id} {$push {:all-decks deck-name}})
+    (mgcoll/update user-coll-name {:_id deck-document-id} {$push {:all-decks deck-map}})
     )
   )
 
-(defn new-user [username]
-  ;(mgcore/connect!)
-  ;(mgcore/set-db! (mgcore/get-db "card-db"))
-  (add-new-collection username)
-  (add-empty-deck-list username)
-  )
-
-(defn user-has-decks? [username]
+(defn delete-deck
+  "delete all deck data and reference to deck in all-decks
+deck-id is a string"
+  [user-coll-name deck-id]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (if (mgcoll/exists? username)
+  (let [deck-document (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})
+        deck-document-id (deck-document :_id)
+        deck-id-to-delete (ObjectId. deck-id)
+        ]
+    (mgcoll/update-by-id user-coll-name deck-document-id {$pull {:all-decks {:deck-id deck-id-to-delete}}})
+    )
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;End Add Delete Edit Deck
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;Views of Decks / User-Coll
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn user-coll-has-decks? [user-coll-name]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+  (if (mgcoll/exists? user-coll-name)
     true
     false
     )
   )
 
-(defn display-all-decks-in-collection [collection-name]
+(defn display-all-decks-in-user-coll-name-by-id [user-coll-name])
+
+
+
+(defn display-all-decks-in-user-coll [user-coll-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [deck-map (mgcoll/find-one-as-map collection-name {:all-decks {$exists true}})]
+  (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
     (deck-map :all-decks)
     )
   )
 
-;{objectid set-name paragraph notes audio highlighing-color}
-(defn add-card-to-collection [card-map collection-name]
-  (mgcore/connect!)
-  (mgcore/set-db! (mgcore/get-db "card-db"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;END View of Decks / User-coll
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  )
+
+
+;{objectid set-name paragraph notes audio highlighing-color}
+
+
+;;;;;;;;;;;;;;;;;;
+;;;; DB Functions
+;;;;;;;;;;;;;;;;;;;
 
 (defn view-all-collections-in-db [db-name]
   (mgcore/connect!)
@@ -95,3 +144,7 @@
     (mgcoll/insert card-collection entire-map-to-insert)
     )
   )
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;End DB Functions
+;;;;;;;;;;;;;;;;;;;;;;

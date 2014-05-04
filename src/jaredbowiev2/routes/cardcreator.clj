@@ -7,14 +7,25 @@
             [jaredbowiev2.models.cardcreator :refer [receive-card-from-post]]
             [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-collection user-has-decks?]]
             [noir.session :as session]
+            [hiccup.core :refer [html]]
             ))
+
+(defn deck-links [deck-name]
+  (html
+   [:div {:id deck-name} [:font {:class "string"} deck-name]]
+   )
+  )
 
 (defn deck-return [username-logged-in]
   (if (user-has-decks? username-logged-in)
-    (str (display-all-decks-in-collection username-logged-in))
+    (let [all-decks (display-all-decks-in-collection username-logged-in)]
+      (apply str (map #(deck-links %) all-decks))
+      )
     ""
     )
   )
+
+
 
 (defn card-creator []
   (let [username-logged-in (session/get :user)
