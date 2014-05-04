@@ -1,13 +1,9 @@
 (ns jaredbowiev2.models.cardcreator
   (:require [clj-time.core :as timecore]
             [clj-time.coerce :as timecoerce]
-            [monger.core :as mgcore :refer [connect! connect set-db! get-db get-db-names]]
-            [monger.collection :as mgcoll :refer [insert insert-batch]]
-            [monger.operators :refer :all]
+            [clojure.data.json :as json]
+            [jaredbowiev2.models.cardcreatoredb :refer :all]
             )
-  (:import [org.bson.types ObjectId]
-           ;[com.mongodb MongoOptions ServerAddress]
-           )
   )
 
 ;make-card (takes one text paragrap, one note paragraph, one audio path)
@@ -24,37 +20,6 @@
                                         ;-export all cards to a TSV
 
 
-(defn monger-play []
-  (mgcore/connect!)
-  ;(mgcore/get-db-names)
-  (mgcore/set-db! (mgcore/get-db "monger-test"))
-  (let [oid (ObjectId.)]
-    (mgcoll/insert "documents" {:_id oid :first_name "John" :last_name "Lennon"})
-    (mgcoll/find-map-by-id "documents" oid))
-  )
-
-
-
-(defn new-card-collection [username collection-name]
-  (mgcore/connect!)
-  (mgcore/set-db! (mgcore/get-db (str username collection-name)))
-  )
-
-(defn add-card-to-db [dbname card-collection card-map]
-  (mgcore/connect!)
-  (mgcore/use-db! dbname)
-  (let [entire-map-to-insert (merge {:_id (ObjectId.)} card-map)]
-    ;(println entire-map-to-insert)
-    (mgcoll/insert card-collection entire-map-to-insert)
-    )
-  )
-
-(defn view-all-cards-in-db-coll [db-name coll-name]
-  (mgcore/connect!)
-  (mgcore/use-db! db-name)
-  (mgcoll/find-maps coll-name)
-  )
-
 (defn one-map-to-tsv [one-map]
   (let [char-seperator "\t"]
     (str (one-map :paragraph) char-seperator (one-map :reading-paragraph) char-seperator (one-map :notes) char-seperator (one-map :audio) "\r"))
@@ -69,7 +34,7 @@
 
 (defn how-things-should-look []
   (slurp "/home/jared/clojureprojects/jaredbowie/jpdpartial")
-  )
+ )
 
 (defn highlight-word
   "takes a word and a highlighting color, then bolds it and colors it
@@ -77,7 +42,6 @@ highlighting must be a string like \"#0000ff\""
   [word highlighting]
   (str "<font color=\"" highlighting "\"><b>" word "</b></font>")
 )
-
 
 (defn make-reading-paragraph [paragraph all-notes]
   (loop [new-paragraph paragraph
@@ -97,7 +61,6 @@ highlighting must be a string like \"#0000ff\""
     ;new-paragraph
     )
   )
-
 
 (defn make-one-note-line
   "returns a string of one line.  inserts furigana if it exists."
@@ -132,6 +95,12 @@ highlighting must be a string like \"#0000ff\""
     ;(println (one-card-group :audio-path))
     ;(println (one-card-group :notes))
     (map #(add-card-to-db db-name card-collection %) all-cards)
+    )
+  )
+
+(defn receive-card-from-post [json-card]
+  (let [clj-card (json/read-str json-card :key-fn keyword)]
+    (println clj-card)
     )
   )
 
