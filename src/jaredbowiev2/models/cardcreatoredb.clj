@@ -21,6 +21,61 @@
   "-display decks to user"
   )
 
+(comment
+  "Deck Model"
+  "DB -> Usernames (collections)"
+  "Username [{:deck-name \"deck1\"
+:_id ObjectId
+:cards [
+{:paragraph \"some text\" :notes [{:japanese \"japanese word\" :reading \"reading\" :english \"english\"}]]"
+
+  )
+
+
+(comment "coll-name" [ {:all-decks [
+                                  {:deck-name "deck-name" :_id ObjectId.}
+                                  {:deck-name "deck-name" :_id ObjectId.}
+                                  ]
+                      :_id ObjectId.
+                      }
+                     ]
+
+        "coll-name" [
+                    {:deck-name "deck1"
+                     :_id ObjectId.
+                     :cards [
+                             {:_id ObjectId.
+                              :paragraph " some text"
+                              :notes [
+                                      {:japanese "japanese word"
+                                       :reading "reading"
+                                       :english "english"
+                                       }
+                                      {:japanese "japanese word"
+                                       :reading "reading"
+                                       :english "english"
+                                       }
+                                      ]
+                              :audio-path "audio-file-name.mp3"
+                              :font-color "#000000"
+                              }
+                             {:_id ObjectId.
+                              :paragraph "some text"
+                          :notes [
+                                      {:japanese "japanese word"
+                                       :reading "reading"
+                                       :english "english"
+                                       }
+                                      {:japanese "japanese word"
+                                       :reading "reading"
+                                       :english "english"
+                                       }
+                                      ]
+                              :audio-path "audio-file-name.mp3"
+                              :font-color "#000000"}
+                             ]
+                     }
+                    ])
 
 ;;;;;;;;;;;;;;
 ;;NEW USER-COLL
@@ -53,18 +108,34 @@
 ;;;;Add Delete Edit Deck
 ;;;;;;;;;;;;;;;;;;;;;
 
+
+(defn add-deck-to-deck-list [user-coll-name deck-name]
+  (mgcoll/insert user-coll-name {:deck-name deck-name
+                                 :_id (ObjectId.)
+                                 :cards []
+                                 })
+  )
+
+(defn add-empty-deck-to-user-coll-name
+  "add empty deck to coll-name so we can $push to it's array later"
+  [user-coll-name deck-name]
+  (let [deck-document (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})
+        deck-document-id (deck-document :_id)
+        deck-object-id (ObjectId.)
+        deck-map {:deck-name deck-name :_id deck-object-id}
+        ]
+    (mgcoll/update user-coll-name {:_id deck-document-id} {$push {:all-decks deck-map}})
+    )
+  )
+
 (defn new-card-deck
   "the username is the collection name.  each user has a list of decks with a unique id (so that duplicate deck names don't cause a problem"
 ; card-db - > username -> {:all-decks [{deck-name "deck1" deck-id "deck-id"}]
   [user-coll-name deck-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [deck-document (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})
-        deck-document-id (deck-document :_id)
-        deck-map {:deck-name deck-name :deck-id (ObjectId.)}
-        ]
-    (mgcoll/update user-coll-name {:_id deck-document-id} {$push {:all-decks deck-map}})
-    )
+  (add-deck-to-deck-list user-coll-name deck-name)
+  (add-empty-deck-to-user-coll-name user-coll-name deck-name)
   )
 
 (defn delete-deck
@@ -85,6 +156,22 @@ deck-id is a string"
 ;;;;;End Add Delete Edit Deck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;Add Edit Delete Cards in Deck
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn add-card-to-deck [user-coll-name deck-id card-map]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+  (let [deck-id-object (ObjectId. deck-id)]
+    (mgcoll/update-by-id user-coll-name deck-id-object {$push {}}))
+
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;End Add Edit Delete Cards
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;Views of Decks / User-Coll
@@ -101,6 +188,12 @@ deck-id is a string"
 (defn display-all-decks-in-user-coll-name-by-id [user-coll-name])
 
 
+(defn display-all-cards-in-deck [user-coll-name deck-id]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+  (let [])
+  (mgcoll/find-map-by-id user-coll-name deck-id)
+  )
 
 (defn display-all-decks-in-user-coll [user-coll-name]
   (mgcore/connect!)
@@ -108,6 +201,23 @@ deck-id is a string"
   (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
     (deck-map :all-decks)
     )
+  )
+
+;good
+(defn display-all-deck-names-from-deck-list [user-coll-name]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+   (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
+     (map #(% :deck-name) (deck-map :all-decks))
+    )
+  )
+
+;good
+(defn display-all-decks-that-really-exist [user-coll-name]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+  (map #(% :deck-name) (mgcoll/find-maps user-coll-name {:deck-name {$exists true}}))
+
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -135,15 +245,6 @@ deck-id is a string"
   (mgcore/get-db-names)
   )
 
-
-(defn add-card-to-db [dbname card-collection card-map]
-  (mgcore/connect!)
-  (mgcore/use-db! dbname)
-  (let [entire-map-to-insert (merge {:_id (ObjectId.)} card-map)]
-    ;(println entire-map-to-insert)
-    (mgcoll/insert card-collection entire-map-to-insert)
-    )
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;End DB Functions

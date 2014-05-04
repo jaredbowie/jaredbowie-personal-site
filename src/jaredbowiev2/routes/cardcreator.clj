@@ -5,20 +5,21 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-collection user-has-decks?]]
+            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll user-has-decks?]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
 
-(defn deck-links [deck-name]
+(defn deck-links [deck-map]
+  (println (deck-map :deck-id))
   (html
-   [:div {:id deck-name} [:font {:class "string"} deck-name]]
+   [:div {:class "deck-name" :id (deck-map :deck-id)} [:font {:class "string"} (deck-map :deck-name)]]
    )
   )
 
 (defn deck-return [username-logged-in]
   (if (user-has-decks? username-logged-in)
-    (let [all-decks (display-all-decks-in-collection username-logged-in)]
+    (let [all-decks (display-all-decks-in-user-coll username-logged-in)]
       (apply str (map #(deck-links %) all-decks))
       )
     ""
