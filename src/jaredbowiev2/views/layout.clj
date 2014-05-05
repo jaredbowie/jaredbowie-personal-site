@@ -23,7 +23,6 @@
     )
   )
 
-
 (defn header-links
   []
   [ ;{:text "\"articles\"" :link "http://jaredbowie.com/articles"}

@@ -1,9 +1,10 @@
 $(document).ready(function(){
-    var allNoteNames = [];
     $('#add-notes-button').click(function(){
         $('<div class="one-input"><div class="left-label"><label form="notes-chunk"><font class="string">"Note" </font></label></div><div class="right-label"><div class = "one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
     });
+
     $('#submit-button').click(function(){
+        var allNoteNames = [];
         var oneCardObj = new Object();
         oneCardObj.paragraph =  $('#paragraph').val();
         // var notesText =
@@ -26,11 +27,20 @@ $(document).ready(function(){
         });
         //$.post("card-creator", clojureMapToSend);
     });
+
+    $('.deck-name').click(function(){
+        var deckId = $(this).attr('id');
+        console.log(deckId);
+        // get id
+        // post id get cards
+        // display cards
+        });
+
 });
 
 var groupThings = function(allNoteNames){
     var theReading = "";
-    var theWhole = []
+    var theWhole = [];
     var tempObject = new Object();
     for (var i=0; i < allNoteNames.length; i+=3) {
         if (allNoteNames.length === 0) {
@@ -45,4 +55,16 @@ var groupThings = function(allNoteNames){
         theWhole.push(tempObject);
     }
     return theWhole;
+};
+
+var returnCards = function(deckId){
+    request = $.ajax({
+        url: "card-creator/return-card",
+        type: "post",
+        data: {
+            deckid: deckId },
+        success: function(r){
+            console.log(r);
+        }
+    });
 };

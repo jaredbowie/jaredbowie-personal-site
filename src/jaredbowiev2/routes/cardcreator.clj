@@ -2,10 +2,11 @@
   (:require [jaredbowiev2.views.layout :as layout]
             [hiccup.form :refer [form-to label text-field submit-button]]
             [compojure.core :refer [defroutes GET POST]]
+            [noir.util.route :refer [def-restricted-routes]]
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll user-has-decks?]]
+            [jaredbowiev2.models.cardcreatoredb :refer [display-all-cards-in-deck user-has-decks?]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
@@ -13,7 +14,7 @@
 (defn deck-links [deck-map]
   (println (deck-map :deck-id))
   (html
-   [:div {:class "deck-name" :id (deck-map :deck-id)} [:font {:class "string"} (deck-map :deck-name)]]
+   [:div {:class "deck-name" :id (deck-map :_id)} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} (deck-map :deck-name)] [:font {:class "para1"} ")"]]]
    )
   )
 
@@ -25,8 +26,6 @@
     ""
     )
   )
-
-
 
 (defn card-creator []
   (let [username-logged-in (session/get :user)
@@ -61,8 +60,8 @@
      "")))
 
 
-
-(defroutes card-creator-routes
+(def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
   (POST "/card-creator" [onecard] (receive-card-from-post onecard))
+  (POST "/card-creator/return-cards" [userid deckid] (display-all-cards-in-deck userid (session/get :user)))
 )

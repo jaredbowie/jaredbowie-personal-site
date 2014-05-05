@@ -74,7 +74,8 @@
           :session-options {:cookie-name "example-app-session"
                       :store (cookie-store)}
            ;; add access rules here
-          :access-rules [;user-access
+          :access-rules [{:uri "/card-creator/*"
+                          :rule user-access}
                          {:uri "/add-post"
                           :rule jared-access}]
            ;; serialize/deserialize the following data formats

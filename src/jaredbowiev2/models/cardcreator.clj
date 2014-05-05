@@ -20,8 +20,6 @@
                                         ;-export all cards to a TSV
 
 
-
-
 (defn one-map-to-tsv [one-map]
   (let [char-seperator "\t"]
     (str (one-map :paragraph) char-seperator (one-map :reading-paragraph) char-seperator (one-map :notes) char-seperator (one-map :audio) "\r"))
