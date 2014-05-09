@@ -6,7 +6,7 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :refer [display-all-cards-in-deck user-has-decks?]]
+            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll display-all-cards-in-deck user-coll-has-decks?]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
@@ -19,7 +19,7 @@
   )
 
 (defn deck-return [username-logged-in]
-  (if (user-has-decks? username-logged-in)
+  (if (user-coll-has-decks? username-logged-in)
     (let [all-decks (display-all-decks-in-user-coll username-logged-in)]
       (apply str (map #(deck-links %) all-decks))
       )

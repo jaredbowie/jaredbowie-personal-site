@@ -25,12 +25,12 @@
     (str (one-map :paragraph) char-seperator (one-map :reading-paragraph) char-seperator (one-map :notes) char-seperator (one-map :audio) "\r"))
   )
 
-(defn all-maps-to-tsv [db-name coll-name]
-  (let [all-cards (view-all-cards-in-db-coll db-name coll-name)]
-    (spit "tempcards.txt" (apply str (map #(one-map-to-tsv %) all-cards)))
-    (apply str (map #(one-map-to-tsv %) all-cards))
-    )
-  )
+#_(comment (defn all-maps-to-tsv [db-name coll-name]
+           (let [all-cards (view-all-cards-in-db-coll db-name coll-name)]
+             (spit "tempcards.txt" (apply str (map #(one-map-to-tsv %) all-cards)))
+             (apply str (map #(one-map-to-tsv %) all-cards))
+             )
+           ))
 
 (defn how-things-should-look []
   (slurp "/home/jared/clojureprojects/jaredbowie/jpdpartial")
@@ -84,19 +84,19 @@ highlighting must be a string like \"#0000ff\""
               :audio audio-path))
   )
 
-(defn make-card [db-name card-collection one-card-group highlighting-color]
-  (let [reading-paragraph (make-reading-paragraph (one-card-group :paragraph) (one-card-group :notes))
-        all-cards (map #(make-one-card-map (one-card-group :paragraph) reading-paragraph highlighting-color % (one-card-group :audio) (one-card-group :notes)) (one-card-group :notes))
-        ]
-    ;(println (one-card-group :paragraph))
-    ;(println reading-paragraph)
-    ;(println highlighting-color)
-    ;(println (first (one-card-group :notes)))
-    ;(println (one-card-group :audio-path))
-    ;(println (one-card-group :notes))
-    (map #(add-card-to-db db-name card-collection %) all-cards)
-    )
-  )
+#_(comment (defn make-card [db-name card-collection one-card-group highlighting-color]
+           (let [reading-paragraph (make-reading-paragraph (one-card-group :paragraph) (one-card-group :notes))
+                 all-cards (map #(make-one-card-map (one-card-group :paragraph) reading-paragraph highlighting-color % (one-card-group :audio) (one-card-group :notes)) (one-card-group :notes))
+                 ]
+                                        ;(println (one-card-group :paragraph))
+                                        ;(println reading-paragraph)
+                                        ;(println highlighting-color)
+                                        ;(println (first (one-card-group :notes)))
+                                        ;(println (one-card-group :audio-path))
+                                        ;(println (one-card-group :notes))
+             (map #(add-card-to-db db-name card-collection %) all-cards)
+             )
+           ))
 
 (defn receive-card-from-post [json-card]
   (let [clj-card (json/read-str json-card :key-fn keyword)]
@@ -116,18 +116,18 @@ highlighting must be a string like \"#0000ff\""
   )
 
 
-(defn test-make-a-card []
-  (let [one-card-group {:paragraph "よし: 今日何しますか。<p>たけ: 今日？天気を見てください！いよいよ夏が来ました。晴れで、暑くて、夏本番ですよ！今日は海に行きます。<p>よし: 海ですか。あまり行きたくないです。"
- :notes [{:word "天気を見てください" :reading nil :translation "Please look at the weather."}
-         {:word "いよいよ" :reading nil :translation "Finally, more and more"}
-         {:word "晴れ" :reading "はれ" :translation "clear weather"}
-         {:word "夏本番" :reading "なつほんばん" :translation "midsummer; height of summer"}
-         {:word "あまり" :reading nil :translation "not much"}]
- :audio "/home/jared/jopd-85-01.mp3"
- }
-        ]
-    (make-card "card-db" "test3" one-card-group "#0000ff")
-    )
-  )
+#_(comment (defn test-make-a-card []
+           (let [one-card-group {:paragraph "よし: 今日何しますか。<p>たけ: 今日？天気を見てください！いよいよ夏が来ました。晴れで、暑くて、夏本番ですよ！今日は海に行きます。<p>よし: 海ですか。あまり行きたくないです。"
+                                 :notes [{:word "天気を見てください" :reading nil :translation "Please look at the weather."}
+                                         {:word "いよいよ" :reading nil :translation "Finally, more and more"}
+                                         {:word "晴れ" :reading "はれ" :translation "clear weather"}
+                                         {:word "夏本番" :reading "なつほんばん" :translation "midsummer; height of summer"}
+                                         {:word "あまり" :reading nil :translation "not much"}]
+                                 :audio "/home/jared/jopd-85-01.mp3"
+                                 }
+                 ]
+             (make-card "card-db" "test3" one-card-group "#0000ff")
+             )
+           ))
 
 ;<div>よし:<span class=\"Apple-tab-span\" style=\"white-space: pre\"> </span>今日何しますか。</div><div><br /></div><div>たけ:<span class=\"Apple-tab-span\" style=\"white-space: pre ; \"> </span>今日？<font color=\"#0000ff\">天気を見てください</font>！いよいよ夏が来ました。晴れで、暑くて、夏本番ですよ！今日は海に行きます。</div><div><br /></div><div>よし:<span class=\"Apple-tab-span\" style=\"white-space: pre; \"> </span>海ですか。あまり行きたくないです。</div>\t天気を見てください=Please look at the weather.<div>いよいよ=Finally, more and more</div><div>晴れ[はれ]=clear weather;&nbsp;</div><div>夏本番[なつほんばん]=midsummer; height of summer</div><div>あまり=not much</div>\t<div>よし:<span class=\"Apple-tab-span\" style=\"white-space: pre\"> </span>今日何しますか。</div><div><br /></div><div>たけ:<span class=\"Apple-tab-span\" style=\"white-space: pre; \"> </span>今日？<font color=\"#0000ff\">天気を見てください</font>！いよいよ夏が来ました。晴[は]れで、暑くて、夏本番[なつほんばん]ですよ！今日は海に行きます。</div><div><br /></div><div>よし:<span class=\"Apple-tab-span\" style=\"white-space: pre; \"> </span>海ですか。あまり行きたくないです。</div>\t[sound:jpod-85-01.mp3]\t\tこうじょうから送おくったスマートフォン　去年きょねんより少すくなくなる\n

@@ -109,15 +109,8 @@
 ;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn add-deck-to-deck-list [user-coll-name deck-name]
-  (mgcoll/insert user-coll-name {:deck-name deck-name
-                                 :_id (ObjectId.)
-                                 :cards []
-                                 })
-  )
-
-(defn add-empty-deck-to-user-coll-name
-  "add empty deck to coll-name so we can $push to it's array later"
+(defn add-deck-to-deck-list
+  ""
   [user-coll-name deck-name]
   (let [deck-document (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})
         deck-document-id (deck-document :_id)
@@ -128,8 +121,17 @@
     )
   )
 
+(defn add-empty-deck-to-user-coll-name
+  "add empty deck to coll-name so we can $push to it's array later"
+ [user-coll-name deck-name]
+ (mgcoll/insert user-coll-name {:deck-name deck-name
+                                :_id (ObjectId.)
+                                :cards []
+                                })
+  )
+
 (defn new-card-deck
-  "the username is the collection name.  each user has a list of decks with a unique id (so that duplicate deck names don't cause a problem"
+  "the username is the collection name.  each user has a list of decks with a unique id (so that duplicate deck names don't cause a problem) this will both add a empty deck and a the deck-name to the deck-list to make it easier to list decks later"
 ; card-db - > username -> {:all-decks [{deck-name "deck1" deck-id "deck-id"}]
   [user-coll-name deck-name]
   (mgcore/connect!)
@@ -164,8 +166,25 @@ deck-id is a string"
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
   (let [deck-id-object (ObjectId. deck-id)]
-    (mgcoll/update-by-id user-coll-name deck-id-object {$push {}}))
+    (mgcoll/update-by-id user-coll-name deck-id-object {$push {:cards card-map}})))
 
+(defn test-cardcreatoredb-add-card-to-deck []
+  (let [card-map {:_id (ObjectId.)
+                              :paragraph "some text"
+                              :notes [
+                                      {:japanese "japanese word"
+                                       :reading "reading"
+                                       :english "english"
+                                       }
+                                      {:japanese "japanese word"
+                                       :reading "reading"
+                                       :english "english"
+                                       }
+                                      ]
+                              :audio-path "audio-file-name.mp3"
+                              :font-color "#000000"
+                  }]
+    (add-card-to-deck "jared" "5366348744aebe1b4f9d44aa" card-map))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -176,6 +195,7 @@ deck-id is a string"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;Views of Decks / User-Coll
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn user-coll-has-decks? [user-coll-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
@@ -187,15 +207,18 @@ deck-id is a string"
 
 (defn display-all-decks-in-user-coll-name-by-id [user-coll-name])
 
-
-(defn display-all-cards-in-deck [user-coll-name deck-id]
+(defn display-all-cards-in-deck
+"takes user-coll-name as string and deck-id as a string"
+  [user-coll-name deck-id]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [])
-  (mgcoll/find-map-by-id user-coll-name deck-id)
+  (let [deck-id-object (ObjectId. deck-id)]
+    (mgcoll/find-map-by-id user-coll-name deck-id-object))
   )
 
-(defn display-all-decks-in-user-coll [user-coll-name]
+(defn display-all-decks-in-user-coll
+  "display all users decks from deck list"
+  [user-coll-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
   (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
@@ -203,21 +226,20 @@ deck-id is a string"
     )
   )
 
-;good
-(defn display-all-deck-names-from-deck-list [user-coll-name]
-  (mgcore/connect!)
-  (mgcore/set-db! (mgcore/get-db "card-db"))
-   (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
-     (map #(% :deck-name) (deck-map :all-decks))
-    )
-  )
+;good, but think i don't need a deck list
+(comment (defn display-all-deck-names-from-deck-list [user-coll-name]
+           (mgcore/connect!)
+           (mgcore/set-db! (mgcore/get-db "card-db"))
+           (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
+             (map #(% :deck-name) (deck-map :all-decks))
+             )
+           ))
 
 ;good
 (defn display-all-decks-that-really-exist [user-coll-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
   (map #(% :deck-name) (mgcoll/find-maps user-coll-name {:deck-name {$exists true}}))
-
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
