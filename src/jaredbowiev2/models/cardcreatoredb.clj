@@ -4,9 +4,9 @@
             [monger.collection :as mgcoll :refer [insert insert-batch]]
             [monger.operators :refer :all]
             [monger.db :as mgdb :refer [get-collection-names]]
+            [clojure.data.json :as json]
             )
-  (:import [org.bson.types ObjectId]
-           )
+  (:import [org.bson.types ObjectId])
   )
 
 
@@ -207,6 +207,8 @@ deck-id is a string"
 
 (defn display-all-decks-in-user-coll-name-by-id [user-coll-name])
 
+
+
 (defn display-all-cards-in-deck
 "takes user-coll-name as string and deck-id as a string"
   [user-coll-name deck-id]
@@ -216,13 +218,26 @@ deck-id is a string"
     (mgcoll/find-map-by-id user-coll-name deck-id-object))
   )
 
-(defn display-all-decks-in-user-coll
+(defn display-all-cards-in-deck-json [user-coll-name deck-id]
+  (let [map-of-cards (display-all-cards-in-deck user-coll-name deck-id)
+        map-of-cards-no-objects (map #(json/write-str (hash-map :_id (str (% :_id)) :paragraph (% :paragraph) :notes (% :notes) :font-color (% :font-color) :audio-path (% :audio-path))) (map-of-cards :cards))
+        ]
+    ;map-of-cards
+    map-of-cards-no-objects
+    ;(json/write-str map-of-cards)
+    )
+  )
+
+
+(defn display-all-decks-in-user-coll-with-id
   "display all users decks from deck list"
   [user-coll-name]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [deck-map (mgcoll/find-one-as-map user-coll-name {:all-decks {$exists true}})]
-    (deck-map :all-decks)
+  (let [deck-map (mgcoll/find-maps user-coll-name {:deck-name {$exists true}})]
+    deck-map
+    ;(hash-map :deck-name (deck-map :deck-name) :_id (deck-map :_id))
+    (map #(hash-map :deck-name (% :deck-name) :_id (str (% :_id))) deck-map)
     )
   )
 
@@ -235,12 +250,12 @@ deck-id is a string"
              )
            ))
 
-;good
-(defn display-all-decks-that-really-exist [user-coll-name]
-  (mgcore/connect!)
-  (mgcore/set-db! (mgcore/get-db "card-db"))
-  (map #(% :deck-name) (mgcoll/find-maps user-coll-name {:deck-name {$exists true}}))
-  )
+;good, dont think i need a deck list
+(comment (defn display-all-decks-that-really-exist [user-coll-name]
+           (mgcore/connect!)
+           (mgcore/set-db! (mgcore/get-db "card-db"))
+           (map #(% :deck-name) (mgcoll/find-maps user-coll-name {:deck-name {$exists true}}))
+           ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;END View of Decks / User-coll

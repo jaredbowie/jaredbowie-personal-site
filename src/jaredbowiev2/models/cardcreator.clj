@@ -2,7 +2,6 @@
   (:require [clj-time.core :as timecore]
             [clj-time.coerce :as timecoerce]
             [clojure.data.json :as json]
-            [jaredbowiev2.models.cardcreatoredb :refer :all]
             )
   )
 

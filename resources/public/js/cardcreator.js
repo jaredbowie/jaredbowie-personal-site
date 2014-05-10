@@ -31,11 +31,18 @@ $(document).ready(function(){
     $('.deck-name').click(function(){
         var deckId = $(this).attr('id');
         console.log(deckId);
+        request = $.ajax({
+            url: "card-creator/return-cards",
+            type: "get",
+            data: { deckid: deckId },
+            success: function(r){
+                console.log(r);
+                }
+            });
         // get id
         // post id get cards
         // display cards
         });
-
 });
 
 var groupThings = function(allNoteNames){
