@@ -57,7 +57,9 @@
         [:div {:class "right-label"} [:textarea {:name "text-chunk" :id "paragraph"}]]]
        [:div {:class "spacer"}]
        [:div {:class "one-input" :id "notes-section"}
-        [:div {:class "left-label"} [:button {:id "add-notes-button" :type "button"} "Add notes"]]
+        [:div {:class "left-label"} [:button {:id "add-notes-button" :type "button"} "Add One Note"]
+         [:button {:id "delete-one-note-button" :type "button"} "Remove One Note"]
+         ]
         [:div {:class "right-label"} "aaaaaaaaaaaaa"]]
        [:div {:class "spacer"}]
        [:div {:class "one-input"}
@@ -66,7 +68,7 @@
        [:div {:class "spacer"}]
        [:div {:class "one-input"}
         [:div {:class "left-label"} [:font {:class "string"} "\"Submit Button\" "]]
-        [:div {:class "right-label"} [:input {:id "submit-button" :type "button" :value "add card"}]]
+        [:div {:class "right-label"} [:input {:id "submit-button" :type "button" :value "add card"}] [:button {:id "reset-button" :type "button"} "Reset"]]
         ]
        ]
       ]

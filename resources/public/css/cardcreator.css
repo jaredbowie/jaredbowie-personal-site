@@ -68,3 +68,5 @@ div#card-creator {
    /* border:1px solid green;*/
 }
 div.card-name {
+    display: inline;
+}

@@ -32,19 +32,11 @@ $(document).ready(function(){
         $(".card-name").remove();
         var deckId = $(this).attr('id');
         returnCards(deckId);
-// console.log(deckId);
-        //request = $.ajax({
-           // url: "card-creator/return-cards",
-           // type: "get",
-           // data: { deckid: deckId },
-           // success: function(r){
-           //     console.log(r);
-          //      }
-         //   });
-        // get id
-        // post id get cards
-        // display cards
         });
+
+    $('.card-name').click(function(){
+        var cardId = $(this).attr('id');
+     });
 });
 
 var groupThings = function(allNoteNames){
@@ -73,8 +65,19 @@ var returnCards = function(deckId){
         data: {
             deckid: deckId },
         success: function(r){
-            console.log("test");
             $("#font-cards-list").append(r);
+        }
+    });
+};
+
+var returnOneCard = function(cardId){
+    request = $.ajax({
+        url: "card-creator/return-one-card",
+        type: "get",
+        data: {
+            cardid: cardId },
+        success: function(r){
+            console.log(r);
         }
     });
 };
