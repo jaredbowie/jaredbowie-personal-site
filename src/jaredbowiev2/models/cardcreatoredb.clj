@@ -170,7 +170,7 @@ deck-id is a string"
 
 (defn test-cardcreatoredb-add-card-to-deck []
   (let [card-map {:_id (ObjectId.)
-                              :paragraph "some text"
+                              :paragraph "watashi blah blah"
                               :notes [
                                       {:japanese "japanese word"
                                        :reading "reading"
@@ -218,9 +218,9 @@ deck-id is a string"
     (mgcoll/find-map-by-id user-coll-name deck-id-object))
   )
 
-(defn display-all-cards-in-deck-json [user-coll-name deck-id]
+(defn display-all-cards-in-deck-object-as-string [user-coll-name deck-id]
   (let [map-of-cards (display-all-cards-in-deck user-coll-name deck-id)
-        map-of-cards-no-objects (map #(json/write-str (hash-map :_id (str (% :_id)) :paragraph (% :paragraph) :notes (% :notes) :font-color (% :font-color) :audio-path (% :audio-path))) (map-of-cards :cards))
+        map-of-cards-no-objects (map #(hash-map :_id (str (% :_id)) :paragraph (% :paragraph) :notes (% :notes) :font-color (% :font-color) :audio-path (% :audio-path)) (map-of-cards :cards))
         ]
     ;map-of-cards
     map-of-cards-no-objects

@@ -6,22 +6,34 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :as model-cc :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-json]]
+            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
 
-(defn deck-links [deck-map]
+(defn one-deck-link [deck-map]
   (println (deck-map :deck-id))
   (html
    [:div {:class "deck-name" :id (deck-map :_id)} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} (deck-map :deck-name)] [:font {:class "para1"} ")"]]]
    )
   )
 
+(defn one-card-link [one-card-map]
+  (html
+   [:div {:class "card-name" :id (one-card-map :_id)} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} (take 10 (one-card-map :paragraph))] [:font {:class "para1"} ")"]]])
+  )
+
+(defn card-links [user-coll-name deck-id]
+  (let [coll-of-cards (display-all-cards-in-deck-object-as-string (session/get :user) deck-id)]
+    (println coll-of-cards)
+    (apply str (map #(one-card-link %) coll-of-cards))
+    )
+  )
+
 (defn deck-return [username-logged-in]
   (if (user-coll-has-decks? username-logged-in)
     (let [all-decks (display-all-decks-in-user-coll-with-id username-logged-in)]
-      (apply str (map #(deck-links %) all-decks))
+      (apply str (map #(one-deck-link %) all-decks))
       )
     ""
     )
@@ -37,6 +49,7 @@
       (include-js "/js/cardcreator.js")
       (include-css "/css/cardcreator.css")
       [:div {:id "deck-list"} [:font {:class "string"} (str decks)]]
+      [:div {:id "cards-list"} [:font {:class "string" :id "font-cards-list"}]]
       [:form
        {:post "/card-creator"}
        [:div {:class "one-input"}
@@ -63,6 +76,6 @@
 (def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
   (POST "/card-creator" [onecard] (receive-card-from-post onecard))
-  (GET "/card-creator/return-cards" [deckid] (display-all-cards-in-deck-json (session/get :user) deckid)
+  (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid)
        )
 )

@@ -29,16 +29,18 @@ $(document).ready(function(){
     });
 
     $('.deck-name').click(function(){
+        $(".card-name").remove();
         var deckId = $(this).attr('id');
-        console.log(deckId);
-        request = $.ajax({
-            url: "card-creator/return-cards",
-            type: "get",
-            data: { deckid: deckId },
-            success: function(r){
-                console.log(r);
-                }
-            });
+        returnCards(deckId);
+// console.log(deckId);
+        //request = $.ajax({
+           // url: "card-creator/return-cards",
+           // type: "get",
+           // data: { deckid: deckId },
+           // success: function(r){
+           //     console.log(r);
+          //      }
+         //   });
         // get id
         // post id get cards
         // display cards
@@ -66,12 +68,13 @@ var groupThings = function(allNoteNames){
 
 var returnCards = function(deckId){
     request = $.ajax({
-        url: "card-creator/return-card",
-        type: "post",
+        url: "card-creator/return-cards",
+        type: "get",
         data: {
             deckid: deckId },
         success: function(r){
-            console.log(r);
+            console.log("test");
+            $("#font-cards-list").append(r);
         }
     });
 };
