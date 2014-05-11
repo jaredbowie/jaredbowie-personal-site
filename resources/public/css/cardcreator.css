@@ -67,6 +67,17 @@ div#card-creator {
     width: 97%;
    /* border:1px solid green;*/
 }
+
 div.card-name {
     display: inline;
+}
+
+button.add-rem-button {
+    height:40px;
+    width: 100px;
+}
+
+button.submit-reset-button {
+    height:40px;
+    width:75px;
 }

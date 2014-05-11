@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $('#add-notes-button').click(function(){
-        $('<div class="one-input"><div class="left-label"><label form="notes-chunk"><font class="string">"Note" </font></label></div><div class="right-label"><div class = "one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
+        addOneNote();
     });
 
     $('#submit-button').click(function(){
@@ -29,14 +29,22 @@ $(document).ready(function(){
     });
 
     $('.deck-name').click(function(){
+        //console.log("hi");
         $(".card-name").remove();
         var deckId = $(this).attr('id');
         returnCards(deckId);
         });
 
-    $('.card-name').click(function(){
+    $('#cards-list').on("click", ".card-name", function(){
+        //console.log("hi");
         var cardId = $(this).attr('id');
+        var deckId = $(this).attr('deck');
+        returnOneCard(cardId, deckId);
      });
+
+    $('#reset-button').click(function(){
+        resetCard()
+    });
 });
 
 var groupThings = function(allNoteNames){
@@ -70,14 +78,43 @@ var returnCards = function(deckId){
     });
 };
 
-var returnOneCard = function(cardId){
+var returnOneCard = function(cardId, deckId){
+    resetCard();
     request = $.ajax({
         url: "card-creator/return-one-card",
         type: "get",
         data: {
+            deckid: deckId,
             cardid: cardId },
         success: function(r){
-            console.log(r);
+            var cardObject = jQuery.parseJSON(r);
+            $("#paragraph").val(cardObject["paragraph"]);
+            $('#audio-path').val(cardObject["audio-path"]);
+            $("#font-color").val(cardObject["font-color"]);
+            noteInsert(cardObject["notes"]);
         }
     });
+};
+
+var resetCard = function(){
+        //console.log("hi");
+        $("#paragraph").val("");
+        $('#audio-path').val("");
+        $(".input-note").remove();
+        $("#font-color").val("#0000ff");
+    };
+
+var addOneNote = function(){
+    $('<div class="one-input input-note"><div class="left-label"><label form="notes-chunk"><font class="string">"Note" </font></label></div><div class="right-label"><div class = "one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
+};
+
+var noteInsert = function(noteArray){
+    var string1 = '<div class="one-input input-note"><div class="left-label"><label form="notes-chunk"><font class="string">"Note" </font></label></div><div class="right-label"><div class = "one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
+    var string2 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading">';
+    var string3 = '</textarea><textarea placeholder="English" class="notes-english-explanation" name="english">';
+    var string4 = '</textarea></div></div></div>';
+    console.log(noteArray[0]["japanese"]);
+    for (var i=0; i < noteArray.length; i++) {
+        $(string1 + noteArray[i]["japanese"] + string2 + noteArray[i]["english"] + string3 + noteArray[i]["reading"] + string4).insertAfter('#notes-section');
+        }
 };
