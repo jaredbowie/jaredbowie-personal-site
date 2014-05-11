@@ -43,8 +43,17 @@ $(document).ready(function(){
      });
 
     $('#reset-button').click(function(){
-        resetCard()
+        //console.log('reset button');
+        resetCard();
     });
+    // so i remember
+    // trying to get remove button to work
+    // remove button is 3 levels deep from the nearest button the exists when page first loads
+    $('#notes-section').on('click', "button.add-rem-button", function(){
+        console.log("hi");
+        });
+
+
 });
 
 var groupThings = function(allNoteNames){
@@ -79,6 +88,7 @@ var returnCards = function(deckId){
 };
 
 var returnOneCard = function(cardId, deckId){
+    console.log('returneOneCard');
     resetCard();
     request = $.ajax({
         url: "card-creator/return-one-card",
@@ -105,15 +115,16 @@ var resetCard = function(){
     };
 
 var addOneNote = function(){
-    $('<div class="one-input input-note"><div class="left-label"><label form="notes-chunk"><font class="string">"Note" </font></label></div><div class="right-label"><div class = "one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
+    $('<div class="one-input"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
 };
 
+//insert notes with the strings from an array
 var noteInsert = function(noteArray){
-    var string1 = '<div class="one-input input-note"><div class="left-label"><label form="notes-chunk"><font class="string">"Note" </font></label></div><div class="right-label"><div class = "one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
+    var string1 = '<div class="one-input"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
     var string2 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading">';
     var string3 = '</textarea><textarea placeholder="English" class="notes-english-explanation" name="english">';
     var string4 = '</textarea></div></div></div>';
-    console.log(noteArray[0]["japanese"]);
+   // console.log(noteArray[0]["japanese"]);
     for (var i=0; i < noteArray.length; i++) {
         $(string1 + noteArray[i]["japanese"] + string2 + noteArray[i]["english"] + string3 + noteArray[i]["reading"] + string4).insertAfter('#notes-section');
         }

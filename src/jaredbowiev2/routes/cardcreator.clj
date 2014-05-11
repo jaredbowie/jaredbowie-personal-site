@@ -52,38 +52,32 @@
       (include-css "/css/cardcreator.css")
       [:div {:id "deck-list"} [:font {:class "string"} (str decks)]]
       [:div {:id "cards-list"} [:font {:class "string" :id "font-cards-list"}]]
-      [:form
-       {:post "/card-creator"}
-       [:div {:class "one-input"}
-        [:div {:class "left-label"} [:font {:class "string"} "\"Text\" "]]
-        [:div {:class "right-label"} [:textarea {:name "text-chunk" :id "paragraph"}]]]
-       [:div {:class "spacer"}]
-       [:div {:class "one-input" :id "notes-section"}
-        [:div {:class "left-label"}
-         [:button {:class "add-rem-button" :id "add-notes-button" :type "button"} "Add One Note"]
-         [:br]
-         [:button {:class "add-rem-button" :id "delete-one-note-button" :type "button"} "Remove One Note"]
-         ]
-        [:div {:class "right-label"} ""]]
-       [:div {:class "spacer"}]
-       [:div {:class "one-input"}
-        [:div {:class "left-label"} [:font {:class "string"} "\"Audio Path\" "]]
-        [:div {:class "right-label"} [:textarea {:name "audio-path" :id "audio-path"}]]]
-       [:div {:class "spacer"}]
-       [:div {:class "one-input"}
-        [:div {:class "left-label"} [:font {:class "string"} "\"Font Color\" "]]
-        [:div {:class "right-label"} [:textarea {:name "font-color" :id "font-color"} "#0000ff"]]]
-       [:div {:class "spacer"}]
-       [:div {:class "one-input"}
-        [:div {:class "left-label"} [:font {:class "string"} "\"Submit Button\" "]]
-        [:div {:class "right-label"}
-         [:button {:class "submit-reset-button" :id "submit-button" :type "button"} "Save Card"]
-         [:button {:class "submit-reset-button" :id "reset-button" :type "button"} "Reset Card"]]
+      [:div {:class "one-input"}
+       [:div {:class "left-label"} [:font {:class "string"} "\"Text\" "]]
+       [:div {:class "right-label"} [:textarea {:name "text-chunk" :id "paragraph"}]]]
+      [:div {:class "spacer"}]
+      [:div {:class "notes-input" :id "notes-section"}
+       [:div {:class "left-label"}
+        [:button {:class "add-rem-button" :id "add-notes-button" :type "button"} "Add One Note"]
         ]
+       [:div {:class "right-label"} ""]]
+      [:div {:class "spacer"}]
+      [:div {:class "one-input"}
+       [:div {:class "left-label"} [:font {:class "string"} "\"Audio Path\" "]]
+       [:div {:class "right-label"} [:textarea {:name "audio-path" :id "audio-path"}]]]
+      [:div {:class "spacer"}]
+      [:div {:class "one-input"}
+       [:div {:class "left-label"} [:font {:class "string"} "\"Font Color\" "]]
+       [:div {:class "right-label"} [:textarea {:name "font-color" :id "font-color"} "#0000ff"]]]
+      [:div {:class "spacer"}]
+      [:div {:class "one-input"}
+       [:div {:class "left-label"} [:font {:class "string"} "\"Submit Button\" "]]
+       [:div {:class "right-label"}
+        [:button {:class "submit-reset-button" :id "submit-button" :type "button"} "Save Card"]
+        [:button {:class "submit-reset-button" :id "reset-button" :type "button"} "Reset Card"]]
        ]
       ]
      "")))
-
 
 (def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
