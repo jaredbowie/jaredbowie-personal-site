@@ -49,8 +49,12 @@ $(document).ready(function(){
     // so i remember
     // trying to get remove button to work
     // remove button is 3 levels deep from the nearest button the exists when page first loads
-    $('#notes-section').on('click', "button.add-rem-button", function(){
-        console.log("hi");
+    $('#card-creator').on('click', "button[buttontype='delete-one-note-button']", function(){
+        var theParents = $(this).closest('.one-note-group');
+        var theNext = $(this).parent().parent();
+        //var theChildrens = theParents.closest('.one-note-group');
+        theNext.remove();
+        console.log(theNext);
         });
 
 
