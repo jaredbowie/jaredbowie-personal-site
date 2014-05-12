@@ -4,34 +4,19 @@ $(document).ready(function(){
     });
 
     $('#submit-button').click(function(){
-        var allNoteNames = [];
-        var oneCardObj = new Object();
-        oneCardObj.paragraph =  $('#paragraph').val();
-        // var notesText =
-        $('.one-note-group').children("textarea").each(function(){
-            //console.log(this.value);
-            allNoteNames.push(this.value);
-        });
-        oneCardObj.notes = groupThings(allNoteNames);
-        console.log(oneCardObj.notes);
-        //var oneNote = $(notesText[1].val());
-        oneCardObj.audio = $('#audio-path').val();
-        // console.log(allNoteNames.length);
-        var jsonStringToSend = JSON.stringify(oneCardObj);
-        console.log(jsonStringToSend);
-        request = $.ajax({
-            url: "card-creator",
-            type: "post",
-            //dataType: "text",
-            data: { onecard: jsonStringToSend }
-        });
+        saveCard();
         //$.post("card-creator", clojureMapToSend);
     });
 
     $('.deck-name').click(function(){
-        //console.log("hi");
+        var deckId = $(this).attr('id'); // grabs deckid from the deck div you click on
+      //  console.log(deckId);
+        var deckName = $(this).attr('deck-name');
+        var deckNameAreaInput = $('div').find('#deck-name-area-input');
+        $(deckNameAreaInput).attr('deckid', deckId);
+        $(deckNameAreaInput).text(deckName);
         $(".card-name").remove();
-        var deckId = $(this).attr('id');
+        resetCard();
         returnCards(deckId);
         });
 
@@ -43,23 +28,60 @@ $(document).ready(function(){
      });
 
     $('#reset-button').click(function(){
-        //console.log('reset button');
+        //console.log(testVar);
         resetCard();
     });
-    // so i remember
-    // trying to get remove button to work
-    // remove button is 3 levels deep from the nearest button the exists when page first loads
+    // remove notes
     $('#card-creator').on('click', "button[buttontype='delete-one-note-button']", function(){
-        var theParents = $(this).closest('.one-note-group');
+        //var theParents = $(this).closest('.one-note-group');
         var theNext = $(this).parent().parent();
         //var theChildrens = theParents.closest('.one-note-group');
         theNext.remove();
         console.log(theNext);
         });
-
-
 });
 
+var deckIdExists = function(){
+    var deckNameAreaInput = $('div').find('#deck-name-area-input');
+    return $(deckNameAreaInput).attr('deckid');
+};
+
+var saveCard = function(){
+    var deckId = deckIdExists();
+    if(typeof deckId === 'undefined'){
+        alert("Must Select a Deck");
+    }
+    else {
+  //var deckId = $('#deck-name-area-input').attr();
+        console.log(deckId);
+        var allNoteNames = [];
+        var oneCardObj = new Object();
+        oneCardObj['paragraph'] =  $('#paragraph').val();
+        $('.one-note-group').children("textarea").each(function(){
+            allNoteNames.push(this.value);
+        });
+        oneCardObj['notes'] = groupThings(allNoteNames);
+        // console.log(oneCardObj.notes);
+        oneCardObj['audio-path'] = $('#audio-path').val();
+        oneCardObj['font-color'] = $('#font-color').val();
+        var jsonStringToSend = JSON.stringify(oneCardObj);
+        console.log(jsonStringToSend);
+         request = $.ajax({
+             url: "card-creator/save-card",
+             type: "post",
+             dataType: "text",
+             data: {
+                 deckid: deckId,
+                 onecardmap: jsonStringToSend },
+             success: function(r){
+                 console.log(r);
+        }
+
+         });
+    };
+};
+
+// gather notes info
 var groupThings = function(allNoteNames){
     var theReading = "";
     var theWhole = [];
@@ -71,9 +93,9 @@ var groupThings = function(allNoteNames){
         else {
             theReading = allNoteNames[i + 1];
             }
-        tempObject.word=allNoteNames[i];
+        tempObject.japanese=allNoteNames[i];
         tempObject.reading = theReading;
-        tempObject.translation = allNoteNames[i + 2];
+        tempObject.english = allNoteNames[i + 2];
         theWhole.push(tempObject);
     }
     return theWhole;
@@ -112,19 +134,20 @@ var returnOneCard = function(cardId, deckId){
 
 var resetCard = function(){
         //console.log("hi");
-        $("#paragraph").val("");
-        $('#audio-path').val("");
-        $(".input-note").remove();
-        $("#font-color").val("#0000ff");
-    };
+    $("#paragraph").val("");
+    $('#audio-path').val("");
+    var notes = $("div[class2='one-note-line']");
+    $(notes).remove();
+    $("#font-color").val("#0000ff");
+};
 
 var addOneNote = function(){
-    $('<div class="one-input"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
+    $('<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
 };
 
 //insert notes with the strings from an array
 var noteInsert = function(noteArray){
-    var string1 = '<div class="one-input"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
+    var string1 = '<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
     var string2 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading">';
     var string3 = '</textarea><textarea placeholder="English" class="notes-english-explanation" name="english">';
     var string4 = '</textarea></div></div></div>';

@@ -4,6 +4,7 @@
             [monger.collection :as mgcoll :refer [insert insert-batch]]
             [monger.operators :refer :all]
             [monger.db :as mgdb :refer [get-collection-names]]
+            [monger.result :as mgresult :refer [ok?]]
             [clojure.data.json :as json]
             )
   (:import [org.bson.types ObjectId])
@@ -150,7 +151,7 @@ deck-id is a string"
         deck-document-id (deck-document :_id)
         deck-id-to-delete (ObjectId. deck-id)
         ]
-    (mgcoll/update-by-id user-coll-name deck-document-id {$pull {:all-decks {:deck-id deck-id-to-delete}}})
+    (mgcoll/remove-by-id user-coll-name deck-id-to-delete)
     )
   )
 
@@ -165,24 +166,31 @@ deck-id is a string"
 (defn add-card-to-deck [user-coll-name deck-id card-map]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [deck-id-object (ObjectId. deck-id)]
-    (mgcoll/update-by-id user-coll-name deck-id-object {$push {:cards card-map}})))
+  (let [deck-id-object (ObjectId. deck-id)
+        deck-map-not-json (json/read-str card-map)
+        card-id (ObjectId.)
+        card-map-with-id (assoc deck-map-not-json :_id card-id)
+        ]
+    (if (mgresult/ok? (mgcoll/update-by-id user-coll-name deck-id-object {$push {:cards card-map-with-id}}))
+      "ok"
+      "fail"
+      )))
 
 (defn test-cardcreatoredb-add-card-to-deck []
-  (let [card-map {:_id (ObjectId.)
-                              :paragraph "watashi blah blah"
-                              :notes [
-                                      {:japanese "japanese word"
-                                       :reading "reading"
-                                       :english "english"
-                                       }
-                                      {:japanese "japanese word"
-                                       :reading "reading"
-                                       :english "english"
-                                       }
-                                      ]
-                              :audio-path "audio-file-name.mp3"
-                              :font-color "#000000"
+  (let [card-map {
+                  :paragraph "watashi blah blah"
+                  :notes [
+                          {:japanese "japanese word"
+                           :reading "reading"
+                           :english "english"
+                           }
+                          {:japanese "japanese word"
+                           :reading "reading"
+                           :english "english"
+                           }
+                          ]
+                  :audio-path "audio-file-name.mp3"
+                  :font-color "#000000"
                   }]
     (add-card-to-deck "jared" "5366348744aebe1b4f9d44aa" card-map))
   )
@@ -214,15 +222,18 @@ deck-id is a string"
   [user-coll-name deck-id]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [deck-id-object (ObjectId. deck-id)]
-    (mgcoll/find-map-by-id user-coll-name deck-id-object))
+  (let [deck-id-object (ObjectId. deck-id)
+        all-cards-in-deck (mgcoll/find-map-by-id user-coll-name deck-id-object)]
+    ;(println (str "all-cards-in-deck" (json/read-str all-cards-in-deck)))
+    all-cards-in-deck)
   )
 
-(defn display-all-cards-in-deck-object-as-string [user-coll-name deck-id]
+(defn display-all-cards-in-deck-object-as-string
+  [user-coll-name deck-id]
   (let [map-of-cards (display-all-cards-in-deck user-coll-name deck-id)
         map-of-cards-no-objects (map #(hash-map :_id (str (% :_id)) :paragraph (% :paragraph) :notes (% :notes) :font-color (% :font-color) :audio-path (% :audio-path)) (map-of-cards :cards))
         ]
-    ;map-of-cards
+    ;(println (str "map-of-cards-no-objects" map-of-cards-no-objects))
     map-of-cards-no-objects
     ;(json/write-str map-of-cards)
     )

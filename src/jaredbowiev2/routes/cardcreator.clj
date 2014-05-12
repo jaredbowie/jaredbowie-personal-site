@@ -6,7 +6,7 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :as model-cc :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json]]
+            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
@@ -17,9 +17,10 @@
 
 (defn one-deck-link [deck-map]
   (println (deck-map :deck-id))
-  (html
-   [:div {:class "deck-name" :id (deck-map :_id)} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} (deck-map :deck-name)] [:font {:class "para1"} ")"]]]
-   )
+  (let [deck-name (deck-map :deck-name)]
+    (html
+     [:div {:class "deck-name" :id (deck-map :_id) :deck-name deck-name} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} deck-name] [:font {:class "para1"} ")"]]]
+     ))
   )
 
 (defn one-card-link [one-card-map deck-id]
@@ -53,6 +54,10 @@
       [:div {:id "deck-list"} [:font {:class "string"} (str decks)]]
       [:div {:id "cards-list"} [:font {:class "string" :id "font-cards-list"}]]
       [:div {:class "one-input"}
+       [:div {:class "left-label"} [:font {:class "string"} "\"Deck\" "]]
+       [:div {:class "right-label"} [:font {:class "string"} [:div {:id "deck-name-area-input"}]]]]
+      [:div {:class "spacer"}]
+      [:div {:class "one-input"}
        [:div {:class "left-label"} [:font {:class "string"} "\"Text\" "]]
        [:div {:class "right-label"} [:textarea {:name "text-chunk" :id "paragraph"}]]]
       [:div {:class "spacer"}]
@@ -81,7 +86,7 @@
 
 (def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
-  (POST "/card-creator" [onecard] (receive-card-from-post onecard))
+  (POST "/card-creator/save-card" [deckid onecardmap] (add-card-to-deck (session/get :user) deckid onecardmap))
   (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid))
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
 )
