@@ -8,6 +8,8 @@ $(document).ready(function(){
         //$.post("card-creator", clojureMapToSend);
     });
 
+
+//click on deck display it's cards
     $('.deck-name').click(function(){
         var deckId = $(this).attr('id'); // grabs deckid from the deck div you click on
       //  console.log(deckId);
@@ -20,6 +22,7 @@ $(document).ready(function(){
         returnCards(deckId);
         });
 
+//click on one card
     $('#cards-list').on("click", ".card-name", function(){
         //console.log("hi");
         var cardId = $(this).attr('id');
@@ -31,6 +34,7 @@ $(document).ready(function(){
         //console.log(testVar);
         resetCard();
     });
+
     // remove notes
     $('#card-creator').on('click', "button[buttontype='delete-one-note-button']", function(){
         //var theParents = $(this).closest('.one-note-group');
@@ -47,6 +51,7 @@ var deckIdExists = function(){
 };
 
 var saveCard = function(){
+    var cardId = "";
     var deckId = deckIdExists();
     if(typeof deckId === 'undefined'){
         alert("Must Select a Deck");
@@ -71,6 +76,7 @@ var saveCard = function(){
              type: "post",
              dataType: "text",
              data: {
+                 cardid: cardId,
                  deckid: deckId,
                  onecardmap: jsonStringToSend },
              success: function(r){
@@ -114,7 +120,7 @@ var returnCards = function(deckId){
 };
 
 var returnOneCard = function(cardId, deckId){
-    console.log('returneOneCard');
+   // console.log('returneOneCard');
     resetCard();
     request = $.ajax({
         url: "card-creator/return-one-card",

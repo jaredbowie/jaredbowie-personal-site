@@ -30,7 +30,7 @@
 
 (defn card-links [user-coll-name deck-id]
   (let [coll-of-cards (display-all-cards-in-deck-object-as-string (session/get :user) deck-id)]
-    (println coll-of-cards)
+    (println (str "coll-of-cards" coll-of-cards))
     (apply str (map #(one-card-link % deck-id) coll-of-cards))
     )
   )
@@ -86,7 +86,7 @@
 
 (def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
-  (POST "/card-creator/save-card" [deckid onecardmap] (add-card-to-deck (session/get :user) deckid onecardmap))
+  (POST "/card-creator/save-card" [cardid deckid onecardmap] (add-card-to-deck (session/get :user) deckid onecardmap))
   (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid))
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
 )
