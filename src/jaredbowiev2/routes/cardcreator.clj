@@ -6,7 +6,7 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :as model-cc :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck]]
+            [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
@@ -53,6 +53,7 @@
       (include-css "/css/cardcreator.css")
       [:div {:id "deck-list"} [:font {:class "string"} (str decks)]]
       [:div {:id "cards-list"} [:font {:class "string" :id "font-cards-list"}]]
+      [:div {:class "one-input" :id "one-card-id"}]
       [:div {:class "one-input"}
        [:div {:class "left-label"} [:font {:class "string"} "\"Deck\" "]]
        [:div {:class "right-label"} [:font {:class "string"} [:div {:id "deck-name-area-input"}]]]]
@@ -86,7 +87,7 @@
 
 (def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
-  (POST "/card-creator/save-card" [cardid deckid onecardmap] (add-card-to-deck (session/get :user) deckid onecardmap))
+  (POST "/card-creator/save-card" [cardid deckid onecardmap] (ccdb/add-card-to-deck cardid (session/get :user) deckid onecardmap))
   (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid))
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
-)
+  )

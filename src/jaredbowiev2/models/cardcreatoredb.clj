@@ -163,11 +163,10 @@ deck-id is a string"
 ;;;;;;;Add Edit Delete Cards in Deck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn add-card-to-deck [user-coll-name deck-id card-map]
+(defn add-card-to-deck [user-coll-name deck-id deck-map-not-json]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
   (let [deck-id-object (ObjectId. deck-id)
-        deck-map-not-json (json/read-str card-map)
         card-id (ObjectId.)
         card-map-with-id (assoc deck-map-not-json :_id card-id)
         ]
@@ -176,6 +175,34 @@ deck-id is a string"
       "fail"
       )))
 
+(defn edit-card-in-deck
+  "takes card-map with no :_id  Deletes card with card-id and then adds a new card with the same id of the new map."
+  [card-id user-coll-name deck-id deck-map-not-json]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+  (let [deck-id-object (ObjectId. deck-id)
+        ;deck-map-not-json (json/read-str card-map)
+        card-id-object (ObjectId. card-id)
+        deck-to-delete (view-card-by-string-id user-coll-name deck-id card-id)
+        card-map-with-id (assoc deck-map-not-json :_id card-id-object)
+        ]
+    (mgcoll/update user-coll-name {:_id deck-id-object}  {$pull {:cards deck-to-delete}})
+    (mgcoll/update-by-id user-coll-name deck-id-object {$addToSet {:cards card-map-with-id}})
+    )
+  )
+
+(defn test-edit-card-in-deck []
+  (edit-card-in-deck "5373357b31da44f9fa4443dd" "jared" "5373347f31da44f9fa4443da" {:paragraph "test-edit" :notes [{:japanese "test 1", :reading "test 1", :english "test 1"}] :audio-path "testedit.mp3" :font-color "#0000ff"})
+  )
+
+(defn add-or-edit-card [cardid user-coll-name deck-id card-map]
+  (let [deck-map-not-json (json/read-str card-map)]
+    (if (= cardid false)
+      (add-card-to-deck user-coll-name deck-id deck-map-not-json)
+      (edit-card-in-deck cardid user-coll-name deck-id deck-map-not-json)
+      )
+    )
+  )
 
 (defn test-cardcreatoredb-add-card-to-deck []
   (let [card-map {
@@ -193,7 +220,26 @@ deck-id is a string"
                   :audio-path "audio-file-name.mp3"
                   :font-color "#000000"
                   }]
-    (add-card-to-deck "jared" "5366348744aebe1b4f9d44aa" card-map))
+    (add-card-to-deck "jared" "5373347f31da44f9fa4443da" card-map)))
+
+
+(defn test-cardcreatoredb-add-card-to-deck-2 []
+  (let [card-map {
+                  :paragraph "paragraph 2 bs"
+                  :notes [
+                          {:japanese "2222222222222222222222222"
+                           :reading "reading2222222222222222222222222"
+                           :english "english2222222222222222222222222"
+                           }
+                          {:japanese "japanese word2222222222222222222222222"
+                           :reading "reading2222222222222222222222222"
+                           :english "english2222222222222222222222222"
+                           }
+                          ]
+                  :audio-path "audio-file-name.mp3"
+                  :font-color "#000000"
+                  }]
+    (add-card-to-deck "jared" "53732f4331da44f9fa4443d4" (json/write-str card-map)))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,7 +272,7 @@ deck-id is a string"
   (let [deck-id-object (ObjectId. deck-id)
         all-cards-in-deck (mgcoll/find-map-by-id user-coll-name deck-id-object)]
     ;(println (str "all-cards-in-deck" (json/read-str all-cards-in-deck)))
-    all-cards-in-deck)
+     all-cards-in-deck)
   )
 
 (defn display-all-cards-in-deck-object-as-string
@@ -281,9 +327,9 @@ deck-id is a string"
 (defn view-card-by-string-id [user-coll-name deck-id card-id]
   (mgcore/connect!)
   (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [all-cards-map ((mgcoll/find-one-as-map user-coll-name {:_id (ObjectId. deck-id)}) :cards)
-        ]
-    (first (filter #(= (ObjectId. card-id) (% :_id)) all-cards-map))
+  (let [all-cards-map ((mgcoll/find-one-as-map user-coll-name {:_id (ObjectId. deck-id)}) :cards)]
+   ; all-cards-map
+    (first (filter #(= (ObjectId. card-id) (:_id %)) all-cards-map))
     )
   )
 

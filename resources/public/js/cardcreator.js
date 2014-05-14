@@ -1,5 +1,8 @@
 $(document).ready(function(){
     $('#add-notes-button').click(function(){
+        //var test = $('div').find('#one-card-id');
+        var cardId = $('#one-card-id').attr('cardid');
+        console.log(cardId);
         addOneNote();
     });
 
@@ -7,7 +10,6 @@ $(document).ready(function(){
         saveCard();
         //$.post("card-creator", clojureMapToSend);
     });
-
 
 //click on deck display it's cards
     $('.deck-name').click(function(){
@@ -20,11 +22,15 @@ $(document).ready(function(){
         $(".card-name").remove();
         resetCard();
         returnCards(deckId);
-        });
+    });
 
 //click on one card
     $('#cards-list').on("click", ".card-name", function(){
         //console.log("hi");
+        resetCard();
+        var cardIdToUse = $(this).attr('id');
+        console.log(cardIdToUse);
+        $("#one-card-id").attr('cardid', cardIdToUse);
         var cardId = $(this).attr('id');
         var deckId = $(this).attr('deck');
         returnOneCard(cardId, deckId);
@@ -42,7 +48,7 @@ $(document).ready(function(){
         //var theChildrens = theParents.closest('.one-note-group');
         theNext.remove();
         console.log(theNext);
-        });
+    });
 });
 
 var deckIdExists = function(){
@@ -51,7 +57,7 @@ var deckIdExists = function(){
 };
 
 var saveCard = function(){
-    var cardId = "";
+
     var deckId = deckIdExists();
     if(typeof deckId === 'undefined'){
         alert("Must Select a Deck");
@@ -71,7 +77,8 @@ var saveCard = function(){
         oneCardObj['font-color'] = $('#font-color').val();
         var jsonStringToSend = JSON.stringify(oneCardObj);
         console.log(jsonStringToSend);
-         request = $.ajax({
+        console.log(cardId);
+        request = $.ajax({
              url: "card-creator/save-card",
              type: "post",
              dataType: "text",
@@ -81,8 +88,7 @@ var saveCard = function(){
                  onecardmap: jsonStringToSend },
              success: function(r){
                  console.log(r);
-        }
-
+             }
          });
     };
 };
@@ -121,7 +127,6 @@ var returnCards = function(deckId){
 
 var returnOneCard = function(cardId, deckId){
    // console.log('returneOneCard');
-    resetCard();
     request = $.ajax({
         url: "card-creator/return-one-card",
         type: "get",
@@ -145,6 +150,7 @@ var resetCard = function(){
     var notes = $("div[class2='one-note-line']");
     $(notes).remove();
     $("#font-color").val("#0000ff");
+    $("#one-card-id").removeAttr("cardid");
 };
 
 var addOneNote = function(){
