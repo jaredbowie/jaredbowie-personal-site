@@ -57,7 +57,10 @@ var deckIdExists = function(){
 };
 
 var saveCard = function(){
-
+    var cardId = $('#one-card-id').attr('cardid');
+    if(typeof cardId === 'undefined'){
+        var cardId = false;
+    };
     var deckId = deckIdExists();
     if(typeof deckId === 'undefined'){
         alert("Must Select a Deck");

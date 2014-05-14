@@ -187,7 +187,10 @@ deck-id is a string"
         card-map-with-id (assoc deck-map-not-json :_id card-id-object)
         ]
     (mgcoll/update user-coll-name {:_id deck-id-object}  {$pull {:cards deck-to-delete}})
-    (mgcoll/update-by-id user-coll-name deck-id-object {$addToSet {:cards card-map-with-id}})
+    (if (mgresult/ok? (mgcoll/update-by-id user-coll-name deck-id-object {$addToSet {:cards card-map-with-id}}))
+      "ok"
+      "fail"
+      )
     )
   )
 
@@ -197,7 +200,7 @@ deck-id is a string"
 
 (defn add-or-edit-card [cardid user-coll-name deck-id card-map]
   (let [deck-map-not-json (json/read-str card-map)]
-    (if (= cardid false)
+    (if (= cardid "false")
       (add-card-to-deck user-coll-name deck-id deck-map-not-json)
       (edit-card-in-deck cardid user-coll-name deck-id deck-map-not-json)
       )

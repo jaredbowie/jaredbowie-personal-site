@@ -87,7 +87,7 @@
 
 (def-restricted-routes card-creator-routes
   (GET "/card-creator" [] (card-creator))
-  (POST "/card-creator/save-card" [cardid deckid onecardmap] (ccdb/add-card-to-deck cardid (session/get :user) deckid onecardmap))
+  (POST "/card-creator/save-card" [cardid deckid onecardmap] (ccdb/add-or-edit-card cardid (session/get :user) deckid onecardmap))
   (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid))
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
   )
