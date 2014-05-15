@@ -1,4 +1,4 @@
-html,	
+html,
 body {
 	margin:0;
 	padding:0;
@@ -30,6 +30,11 @@ body {
 	bottom:0;
 	left:0;
 }
+font.emacsfooter {
+	color:#374046;
+	background-color:#1a1a1a;
+}
+
 font.para1 {
 	color:#8B0000;
 }
@@ -38,7 +43,9 @@ font.functionbuiltin {
 }
 font.string {
 	color:#61CE3C;
-}			
+}
+/*font.bracket*/
+
 a:link {
 	color:inherit;
 	text-decoration:inherit;

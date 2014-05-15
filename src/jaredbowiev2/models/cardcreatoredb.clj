@@ -125,10 +125,13 @@
 (defn add-empty-deck-to-user-coll-name
   "add empty deck to coll-name so we can $push to it's array later"
  [user-coll-name deck-name]
- (mgcoll/insert user-coll-name {:deck-name deck-name
-                                :_id (ObjectId.)
-                                :cards []
-                                })
+ (if (mgresult/ok? (mgcoll/insert user-coll-name {:deck-name deck-name
+                                                  :_id (ObjectId.)
+                                                  :cards []
+                                                  }))
+   "ok"
+   "fail"
+   )
   )
 
 (defn new-card-deck
@@ -158,6 +161,43 @@ deck-id is a string"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;End Add Delete Edit Deck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;View Cards ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defn view-card-by-string-id [user-coll-name deck-id card-id]
+  (mgcore/connect!)
+  (mgcore/set-db! (mgcore/get-db "card-db"))
+  (let [all-cards-map ((mgcoll/find-one-as-map user-coll-name {:_id (ObjectId. deck-id)}) :cards)]
+   ; all-cards-map
+    (first (filter #(= (ObjectId. card-id) (:_id %)) all-cards-map))
+    )
+  )
+
+(defn view-card-by-string-id-json [user-coll-name deck-id card-id]
+  (println user-coll-name)
+  (println deck-id)
+  (println card-id)
+  (let [one-card-map (view-card-by-string-id user-coll-name deck-id card-id)
+        one-card-map-no-id (dissoc one-card-map :_id)
+        one-card-map-object-string (assoc one-card-map :_id (str (one-card-map :_id)))
+        ]
+    (json/write-str one-card-map-object-string)
+    )
+  )
+
+(defn test-view-card-by-string-id-json []
+  (view-card-by-string-id-json "jared" "5366348744aebe1b4f9d44aa" "536cd30131da9361979ee760")
+  )
+
+(defn test-view-card-by-string-id []
+  (view-card-by-string-id "jared" "5366348744aebe1b4f9d44aa" "536cd30131da9361979ee760")
+  )
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;Add Edit Delete Cards in Deck
@@ -321,41 +361,6 @@ deck-id is a string"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;END View of Decks / User-coll
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;View Cards ;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(defn view-card-by-string-id [user-coll-name deck-id card-id]
-  (mgcore/connect!)
-  (mgcore/set-db! (mgcore/get-db "card-db"))
-  (let [all-cards-map ((mgcoll/find-one-as-map user-coll-name {:_id (ObjectId. deck-id)}) :cards)]
-   ; all-cards-map
-    (first (filter #(= (ObjectId. card-id) (:_id %)) all-cards-map))
-    )
-  )
-
-(defn view-card-by-string-id-json [user-coll-name deck-id card-id]
-  (println user-coll-name)
-  (println deck-id)
-  (println card-id)
-  (let [one-card-map (view-card-by-string-id user-coll-name deck-id card-id)
-        one-card-map-no-id (dissoc one-card-map :_id)
-        one-card-map-object-string (assoc one-card-map :_id (str (one-card-map :_id)))
-        ]
-    (json/write-str one-card-map-object-string)
-    )
-  )
-
-(defn test-view-card-by-string-id-json []
-  (view-card-by-string-id-json "jared" "5366348744aebe1b4f9d44aa" "536cd30131da9361979ee760")
-  )
-
-(defn test-view-card-by-string-id []
-  (view-card-by-string-id "jared" "5366348744aebe1b4f9d44aa" "536cd30131da9361979ee760")
-  )
-
 
 ;;;;;;;;;;;;;;;;;;
 ;;;; DB Functions

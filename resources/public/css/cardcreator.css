@@ -72,6 +72,10 @@ div.card-name {
     display: inline;
 }
 
+div.deck-name {
+    display: inline;
+}
+
 button.add-rem-button {
     height:40px;
     width: 100px;
@@ -80,4 +84,12 @@ button.add-rem-button {
 button.submit-reset-button {
     height:40px;
     width:75px;
+}
+
+div.add-deck {
+    display: inline;
+}
+
+div.add-card {
+    display: inline;
 }

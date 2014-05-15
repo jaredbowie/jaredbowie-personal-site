@@ -1,4 +1,26 @@
 $(document).ready(function(){
+
+    $('div.add-deck').click(function(){
+        var deckName = prompt("Deck Name");
+        if(deckName != null){
+            request = $.ajax({
+                url: "card-creator/new-deck",
+                type: "post",
+                dataType: "text",
+                data: {
+                    deckname: deckName },
+                success: function(r){
+                    console.log(r);
+                }
+            });
+            console.log(deckName);
+        }
+    });
+
+    $('div.card-name').click(function(){
+        console.log('add-card');
+    });
+
     $('#add-notes-button').click(function(){
         //var test = $('div').find('#one-card-id');
         var cardId = $('#one-card-id').attr('cardid');
@@ -15,10 +37,12 @@ $(document).ready(function(){
     $('.deck-name').click(function(){
         var deckId = $(this).attr('id'); // grabs deckid from the deck div you click on
       //  console.log(deckId);
+        var deckDelete = ' <a href="#"><font class="para1">(</font><font class="functionbuiltin">Delete Deck</font><font class="para1">)</font></a>';
         var deckName = $(this).attr('deck-name');
         var deckNameAreaInput = $('div').find('#deck-name-area-input');
         $(deckNameAreaInput).attr('deckid', deckId);
         $(deckNameAreaInput).text(deckName);
+        $(deckNameAreaInput).append(deckDelete);
         $(".card-name").remove();
         resetCard();
         returnCards(deckId);
@@ -29,7 +53,6 @@ $(document).ready(function(){
         //console.log("hi");
         resetCard();
         var cardIdToUse = $(this).attr('id');
-        console.log(cardIdToUse);
         $("#one-card-id").attr('cardid', cardIdToUse);
         var cardId = $(this).attr('id');
         var deckId = $(this).attr('deck');
@@ -129,6 +152,7 @@ var returnCards = function(deckId){
 };
 
 var returnOneCard = function(cardId, deckId){
+    var cardNameAreaInput = $('div').find('#card-name-area-input');
    // console.log('returneOneCard');
     request = $.ajax({
         url: "card-creator/return-one-card",
@@ -141,6 +165,7 @@ var returnOneCard = function(cardId, deckId){
             $("#paragraph").val(cardObject["paragraph"]);
             $('#audio-path').val(cardObject["audio-path"]);
             $("#font-color").val(cardObject["font-color"]);
+            $(cardNameAreaInput).text(cardObject["paragraph"].substring(0,10));
             noteInsert(cardObject["notes"]);
         }
     });
@@ -148,6 +173,8 @@ var returnOneCard = function(cardId, deckId){
 
 var resetCard = function(){
         //console.log("hi");
+    var cardNameAreaInput = $('div').find('#card-name-area-input');
+    $(cardNameAreaInput).text("");
     $("#paragraph").val("");
     $('#audio-path').val("");
     var notes = $("div[class2='one-note-line']");

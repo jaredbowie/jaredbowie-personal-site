@@ -6,7 +6,7 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :as model-cc :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck]]
+            [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck add-empty-deck-to-user-coll-name]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
@@ -19,13 +19,13 @@
   (println (deck-map :deck-id))
   (let [deck-name (deck-map :deck-name)]
     (html
-     [:div {:class "deck-name" :id (deck-map :_id) :deck-name deck-name} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} deck-name] [:font {:class "para1"} ")"]]]
+     [:div {:class "deck-name" :id (deck-map :_id) :deck-name deck-name} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "deck"] " " [:font {:class "string"} "\"" deck-name "\""] [:font {:class "para1"} ")"]]]
      ))
   )
 
 (defn one-card-link [one-card-map deck-id]
   (html
-   [:div {:class "card-name" :id (one-card-map :_id) :deck deck-id} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "link"] " " [:font {:class "string"} (take 10 (one-card-map :paragraph))] [:font {:class "para1"} ")"]]])
+   [:div {:class "card-name" :id (one-card-map :_id) :deck deck-id} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "card"] " " [:font {:class "string"} "\""(take 10 (one-card-map :paragraph)) "\""] [:font {:class "para1"} ")"]]])
   )
 
 (defn card-links [user-coll-name deck-id]
@@ -33,6 +33,15 @@
     (println (str "coll-of-cards" coll-of-cards))
     (apply str (map #(one-card-link % deck-id) coll-of-cards))
     )
+  )
+
+(def add-deck-html
+  [:div {:class "add-deck"} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "Add Deck"] [:font {:class "para1"} ")"]]]
+  )
+
+
+(def add-card-html
+  [:div {:class "add-card"} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "Add Card"] [:font {:class "para1"} ")"]]]
   )
 
 (defn deck-return [username-logged-in]
@@ -51,9 +60,13 @@
       (include-js "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
       (include-js "/js/cardcreator.js")
       (include-css "/css/cardcreator.css")
-      [:div {:id "deck-list"} [:font {:class "string"} (str decks)]]
-      [:div {:id "cards-list"} [:font {:class "string" :id "font-cards-list"}]]
-      [:div {:class "one-input" :id "one-card-id"}]
+      [:div {:id "deck-list"} add-deck-html [:font {:class "string"} (str decks)]]
+      [:div {:class "deck-card-break"} [:font {:class "emacsfooter"} "|"]]
+      [:div {:id "cards-list"} add-card-html [:font {:class "string" :id "font-cards-list"}]]
+      [:div {:class "one-input" :id "one-card-id"}
+       [:div {:class "left-label"} [:font {:class "string"} "\"Card\" "]]
+       [:div {:class "right-label"} [:font {:class "string"} [:div {:id "card-name-area-input"}]]]
+       ]
       [:div {:class "one-input"}
        [:div {:class "left-label"} [:font {:class "string"} "\"Deck\" "]]
        [:div {:class "right-label"} [:font {:class "string"} [:div {:id "deck-name-area-input"}]]]]
@@ -90,4 +103,5 @@
   (POST "/card-creator/save-card" [cardid deckid onecardmap] (ccdb/add-or-edit-card cardid (session/get :user) deckid onecardmap))
   (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid))
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
+  (POST "/card-creator/new-deck" [deckname] (add-empty-deck-to-user-coll-name "jared" deckname))
   )
