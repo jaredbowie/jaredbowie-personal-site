@@ -11,10 +11,39 @@ $(document).ready(function(){
                     deckname: deckName },
                 success: function(r){
                     console.log(r);
+                    location.reload();
                 }
             });
-            console.log(deckName);
         }
+    });
+
+/// making words highlight as they're written
+    $('#card-creator').on('focus', '.notes-japanese-word', function(){
+        // basically just rest the form
+        var paragraphVal = $('#paragraph').text();
+        $("#paragraph").text("");
+        // get the japanese word again
+        var notesJapaneseWord = $('.notes-japanese-word').val();
+        // if japanese word isn't empty
+        if (notesJapaneseWord != ""){
+            // take the current paragraph and make the focus-word the current japaense word
+            var newWordWithFontColor = '<div class="focus-word">' + notesJapaneseWord + '</div><!-- closing focus-word -->';
+            // replace the japanese word in the paragraph with the new colored word
+            var notesJapaneseWordRegEx = new RegExp(notesJapaneseWord, 'g');
+            var newParagraphVal = paragraphVal.replace(notesJapaneseWordRegEx, newWordWithFontColor);
+            // add the new text to the paragraph
+            $('#paragraph').append(newParagraphVal);
+            //console.log(notesJapaneseWord);
+        }
+        else {
+            $('#paragraph').text(paragraphVal);
+        }
+    });
+
+     $('#card-creator').on('focusout', '.notes-japanese-word', function(){
+         var paragraphVal = $('#paragraph').text();
+         $("#paragraph").text("");
+         $('#paragraph').text(paragraphVal);
     });
 
     $('div.card-name').click(function(){
@@ -37,7 +66,7 @@ $(document).ready(function(){
     $('.deck-name').click(function(){
         var deckId = $(this).attr('id'); // grabs deckid from the deck div you click on
       //  console.log(deckId);
-        var deckDelete = ' <a href="#"><font class="para1">(</font><font class="functionbuiltin">Delete Deck</font><font class="para1">)</font></a>';
+        var deckDelete = ' <div class="delete-deck"><a href="#"><font class="para1">(</font><font class="functionbuiltin">Delete Deck</font><font class="para1">)</font></a></div>';
         var deckName = $(this).attr('deck-name');
         var deckNameAreaInput = $('div').find('#deck-name-area-input');
         $(deckNameAreaInput).attr('deckid', deckId);
@@ -46,6 +75,23 @@ $(document).ready(function(){
         $(".card-name").remove();
         resetCard();
         returnCards(deckId);
+    });
+
+
+// delete deck button
+    $("#deck-name-area-input").on("click", "div.delete-deck", function(){
+        var deckIdToDelete = $('#deck-name-area-input').attr('deckid');
+        request = $.ajax({
+            url: "card-creator/delete-deck",
+            type: "post",
+            dataType: "text",
+            data: {
+                deckid: deckIdToDelete },
+            success: function(r){
+                location.reload();
+                console.log(r);
+            }
+        });
     });
 
 //click on one card
@@ -113,6 +159,7 @@ var saveCard = function(){
                  deckid: deckId,
                  onecardmap: jsonStringToSend },
              success: function(r){
+                 location.reload();
                  console.log(r);
              }
          });

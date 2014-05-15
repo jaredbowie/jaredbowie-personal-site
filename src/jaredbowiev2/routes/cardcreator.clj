@@ -6,7 +6,7 @@
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
             [jaredbowiev2.models.cardcreator :as model-cc :refer [receive-card-from-post]]
-            [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck add-empty-deck-to-user-coll-name]]
+            [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck add-empty-deck-to-user-coll-name delete-deck]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
             ))
@@ -73,7 +73,8 @@
       [:div {:class "spacer"}]
       [:div {:class "one-input"}
        [:div {:class "left-label"} [:font {:class "string"} "\"Text\" "]]
-       [:div {:class "right-label"} [:textarea {:name "text-chunk" :id "paragraph"}]]]
+       [:div {:class "right-label"} ;[:textarea {:name "text-chunk" :id "paragraph"}]
+        [:div {:name "paragraph" :id "paragraph" :contenteditable "true"} [:div {:class "focus-word"} ""]]]]
       [:div {:class "spacer"}]
       [:div {:class "notes-input" :id "notes-section"}
        [:div {:class "left-label"}
@@ -103,5 +104,6 @@
   (POST "/card-creator/save-card" [cardid deckid onecardmap] (ccdb/add-or-edit-card cardid (session/get :user) deckid onecardmap))
   (GET "/card-creator/return-cards" [deckid] (card-links (session/get :user) deckid))
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
-  (POST "/card-creator/new-deck" [deckname] (add-empty-deck-to-user-coll-name "jared" deckname))
+  (POST "/card-creator/new-deck" [deckname] (ccdb/add-empty-deck-to-user-coll-name "jared" deckname))
+  (POST "/card-creator/delete-deck" [deckid] (ccdb/delete-deck (session/get :user) deckid))
   )

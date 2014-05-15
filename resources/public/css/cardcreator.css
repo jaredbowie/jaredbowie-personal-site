@@ -26,9 +26,10 @@ textarea#audio-path {
     height: 20px;
 }
 
-textarea#paragraph {
+div#paragraph {
     width: 600px;
     height: 250px;
+    background-color: white;
 }
 
 
@@ -91,5 +92,14 @@ div.add-deck {
 }
 
 div.add-card {
+    display: inline;
+}
+
+div.delete-deck {
+    display: inline;
+}
+
+div.focus-word {
+    color: #0000ff;
     display: inline;
 }

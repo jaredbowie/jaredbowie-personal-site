@@ -154,7 +154,10 @@ deck-id is a string"
         deck-document-id (deck-document :_id)
         deck-id-to-delete (ObjectId. deck-id)
         ]
-    (mgcoll/remove-by-id user-coll-name deck-id-to-delete)
+    (if (mgresult/ok? (mgcoll/remove-by-id user-coll-name deck-id-to-delete))
+      "ok"
+      "fail"
+      )
     )
   )
 
