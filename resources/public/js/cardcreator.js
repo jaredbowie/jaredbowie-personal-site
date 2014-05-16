@@ -17,6 +17,12 @@ $(document).ready(function(){
         }
     });
 
+
+    $('div.add-card').click(function(){
+        resetCard();
+       });
+
+
     $('#card-creator').on('keyup', '.notes-japanese-word', function(){
         setTimeout(function(){
             highlightWords();
@@ -125,7 +131,7 @@ var saveCard = function(){
         console.log(deckId);
         var allNoteNames = [];
         var oneCardObj = new Object();
-        oneCardObj['paragraph'] =  $('#paragraph').val();
+        oneCardObj['paragraph'] =  $('#paragraph').text();
         $('.one-note-group').children("textarea").each(function(){
             allNoteNames.push(this.value);
         });
@@ -156,15 +162,14 @@ var saveCard = function(){
 var highlightWords = function(){
     var currentFocus = $(document.activeElement).filter(':focus');
     var currentFocusId = $(currentFocus).attr('id');
-    var currentFocusJapaneseWord = $("textarea[id='" + currentFocusId + "']").text();
-    console.log(currentFocusJapaneseWord + '-focus jword');
+    var notesJapaneseWord = $("textarea[id='" + currentFocusId + "']").val();
+    console.log(notesJapaneseWord + '-focus jword');
           // basically just rest the form
     var paragraphVal = $('#paragraph').text();
     $("#paragraph").text("");
     // get the japanese word again
-    var notesJapaneseWord = $('.notes-japanese-word').val();
     // if japanese word isn't empty
-    if (notesJapaneseWord != ""){
+    if (typeof notesJapaneseWord != 'undefined'){
         // take the current paragraph and make the focus-word the current japaense word
         var newWordWithFontColor = '<div class="focus-word">' + notesJapaneseWord + '</div><!-- closing focus-word -->';
         // replace the japanese word in the paragraph with the new colored word
@@ -232,7 +237,7 @@ var returnOneCard = function(cardId, deckId){
             cardid: cardId },
         success: function(r){
             var cardObject = jQuery.parseJSON(r);
-            $("#paragraph").val(cardObject["paragraph"]);
+            $("#paragraph").text(cardObject["paragraph"]);
             $('#audio-path').val(cardObject["audio-path"]);
             $("#font-color").val(cardObject["font-color"]);
             $(cardNameAreaInput).text(cardObject["paragraph"].substring(0,10));
@@ -245,7 +250,7 @@ var resetCard = function(){
         //console.log("hi");
     var cardNameAreaInput = $('div').find('#card-name-area-input');
     $(cardNameAreaInput).text("");
-    $("#paragraph").val("");
+    $("#paragraph").text("");
     $('#audio-path').val("");
     var notes = $("div[class2='one-note-line']");
     $(notes).remove();
