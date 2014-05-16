@@ -102,4 +102,5 @@ div.delete-deck {
 div.focus-word {
     color: #0000ff;
     display: inline;
+    font-weight: bold;
 }

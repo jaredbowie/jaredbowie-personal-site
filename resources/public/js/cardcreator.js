@@ -1,5 +1,5 @@
 $(document).ready(function(){
-
+ //   console.log(uniqueNumber());
     $('div.add-deck').click(function(){
         var deckName = prompt("Deck Name");
         if(deckName != null){
@@ -17,33 +17,19 @@ $(document).ready(function(){
         }
     });
 
+    $('#card-creator').on('keyup', '.notes-japanese-word', function(){
+        setTimeout(function(){
+            highlightWords();
+        }, 100);
+        });
+
 /// making words highlight as they're written
     $('#card-creator').on('focus', '.notes-japanese-word', function(){
-        // basically just rest the form
-        var paragraphVal = $('#paragraph').text();
-        $("#paragraph").text("");
-        // get the japanese word again
-        var notesJapaneseWord = $('.notes-japanese-word').val();
-        // if japanese word isn't empty
-        if (notesJapaneseWord != ""){
-            // take the current paragraph and make the focus-word the current japaense word
-            var newWordWithFontColor = '<div class="focus-word">' + notesJapaneseWord + '</div><!-- closing focus-word -->';
-            // replace the japanese word in the paragraph with the new colored word
-            var notesJapaneseWordRegEx = new RegExp(notesJapaneseWord, 'g');
-            var newParagraphVal = paragraphVal.replace(notesJapaneseWordRegEx, newWordWithFontColor);
-            // add the new text to the paragraph
-            $('#paragraph').append(newParagraphVal);
-            //console.log(notesJapaneseWord);
-        }
-        else {
-            $('#paragraph').text(paragraphVal);
-        }
+        highlightWords();
     });
 
-     $('#card-creator').on('focusout', '.notes-japanese-word', function(){
-         var paragraphVal = $('#paragraph').text();
-         $("#paragraph").text("");
-         $('#paragraph').text(paragraphVal);
+    $('#card-creator').on('focusout', '.notes-japanese-word', function(){
+        unHighlightWords();
     });
 
     $('div.card-name').click(function(){
@@ -166,6 +152,43 @@ var saveCard = function(){
     };
 };
 
+
+var highlightWords = function(){
+    var currentFocus = $(document.activeElement).filter(':focus');
+    var currentFocusId = $(currentFocus).attr('id');
+    var currentFocusJapaneseWord = $("textarea[id='" + currentFocusId + "']").text();
+    console.log(currentFocusJapaneseWord + '-focus jword');
+          // basically just rest the form
+    var paragraphVal = $('#paragraph').text();
+    $("#paragraph").text("");
+    // get the japanese word again
+    var notesJapaneseWord = $('.notes-japanese-word').val();
+    // if japanese word isn't empty
+    if (notesJapaneseWord != ""){
+        // take the current paragraph and make the focus-word the current japaense word
+        var newWordWithFontColor = '<div class="focus-word">' + notesJapaneseWord + '</div><!-- closing focus-word -->';
+        // replace the japanese word in the paragraph with the new colored word
+        // regex to match all
+        var notesJapaneseWordRegEx = new RegExp(notesJapaneseWord, 'g');
+        var newParagraphVal = paragraphVal.replace(notesJapaneseWordRegEx, newWordWithFontColor);
+        console.log('newparagraphval=' + newParagraphVal);
+        // add the new text to the paragraph
+        $('#paragraph').append(newParagraphVal);
+        //console.log(notesJapaneseWord);
+    }
+    else {
+        unHighlightWords(paragraphVal);
+    }
+};
+
+var unHighlightWords = function(paragraphVal){
+   // console.log('unhighlight');
+    //var paragraphVal = $('#paragraph').text();
+    //console.log('unhlight para val' + paragraphVal)
+   // $("#paragraph").text("");
+    $('#paragraph').text(paragraphVal);
+};
+
 // gather notes info
 var groupThings = function(allNoteNames){
     var theReading = "";
@@ -230,11 +253,20 @@ var resetCard = function(){
     $("#one-card-id").removeAttr("cardid");
 };
 
+
+// this is for new notes
 var addOneNote = function(){
-    $('<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" name="english"></textarea></div></div></div>').insertAfter('#notes-section');
+    var uniqueId = uniqueNumber();
+    var string1 = '<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" id="';
+    var string2 = '" name="word"></textarea><textarea placeholder="Furigana" class="notes-furigana-word" id="';
+    var string3 = '" name="reading"></textarea><textarea placeholder="English" class="notes-english-explanation" id="';
+    var string4 = '" name="english"></textarea></div></div></div>';
+    var completeStringWithId = string1 + uniqueId + string2 + uniqueId + string3 + uniqueId + string4;
+    $(completeStringWithId).insertAfter('#notes-section');
 };
 
 //insert notes with the strings from an array
+// this is for editing cards when you have to place new notes in
 var noteInsert = function(noteArray){
     var string1 = '<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
     var string2 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading">';
@@ -243,5 +275,13 @@ var noteInsert = function(noteArray){
    // console.log(noteArray[0]["japanese"]);
     for (var i=0; i < noteArray.length; i++) {
         $(string1 + noteArray[i]["japanese"] + string2 + noteArray[i]["english"] + string3 + noteArray[i]["reading"] + string4).insertAfter('#notes-section');
-        }
+    }
+};
+
+var uniqueNumber = function(){
+    var min = 100000000;
+    var max = 999999999;;
+    // and the formula is:
+    var random = Math.floor(Math.random() * (max - min + 1)) + min;
+    return random;
 };
