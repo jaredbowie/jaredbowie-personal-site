@@ -104,3 +104,7 @@ div.focus-word {
     display: inline;
     font-weight: bold;
 }
+
+div#card-name-area-input {
+    display: inline;
+}

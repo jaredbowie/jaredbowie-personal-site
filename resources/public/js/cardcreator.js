@@ -30,13 +30,13 @@ $(document).ready(function(){
         });
 
 /// making words highlight as they're written
-    $('#card-creator').on('focus', '.notes-japanese-word', function(){
+    $('#card-creator').on('click', function(){
         highlightWords();
     });
 
-    $('#card-creator').on('focusout', '.notes-japanese-word', function(){
-        unHighlightWords();
-    });
+    //$('#card-creator').on('focusout', '.notes-japanese-word', function(){
+     //   unHighlightWords();
+//    });
 
     $('div.card-name').click(function(){
         console.log('add-card');
@@ -86,7 +86,7 @@ $(document).ready(function(){
         });
     });
 
-//click on one card
+    //click on one card
     $('#cards-list').on("click", ".card-name", function(){
         //console.log("hi");
         resetCard();
@@ -162,36 +162,56 @@ var saveCard = function(){
 var highlightWords = function(){
     var currentFocus = $(document.activeElement).filter(':focus');
     var currentFocusId = $(currentFocus).attr('id');
+    console.log('currentFocusId' + currentFocusId);
     var notesJapaneseWord = $("textarea[id='" + currentFocusId + "']").val();
-    console.log(notesJapaneseWord + '-focus jword');
+    //console.log(notesJapaneseWord + '-focus jword');
           // basically just rest the form
-    var paragraphVal = $('#paragraph').text();
-    $("#paragraph").text("");
+   // var paragraphVal = $('#paragraph').text();
+    var paragraphVal = $('#paragraph').html();
+    unHighlightWords(paragraphVal);
+    var paragraphValUnHighlight = $('#paragraph').html();
+    // console.log();
+   // $("#paragraph").text("");
     // get the japanese word again
     // if japanese word isn't empty
-    if (typeof notesJapaneseWord != 'undefined'){
+    console.log('paragraphval ' + paragraphValUnHighlight);
+    console.log('notesJapnaeword' + notesJapaneseWord);
+    if (typeof notesJapaneseWord != 'undefined' && notesJapaneseWord != ''){
+        $("#paragraph").html("");
         // take the current paragraph and make the focus-word the current japaense word
         var newWordWithFontColor = '<div class="focus-word">' + notesJapaneseWord + '</div><!-- closing focus-word -->';
         // replace the japanese word in the paragraph with the new colored word
         // regex to match all
         var notesJapaneseWordRegEx = new RegExp(notesJapaneseWord, 'g');
-        var newParagraphVal = paragraphVal.replace(notesJapaneseWordRegEx, newWordWithFontColor);
-        console.log('newparagraphval=' + newParagraphVal);
+        var newParagraphVal = paragraphValUnHighlight.replace(notesJapaneseWordRegEx, newWordWithFontColor);
+      //  console.log('newparagraphval=' + newParagraphVal);
         // add the new text to the paragraph
-        $('#paragraph').append(newParagraphVal);
+       // $('#paragraph').append(newParagraphVal);
+        console.log('newparaval' + newParagraphVal);
+        $('#paragraph').html(newParagraphVal);
         //console.log(notesJapaneseWord);
     }
     else {
-        unHighlightWords(paragraphVal);
+        console.log('else');
+         //$("#paragraph").html("");
+       // unHighlightWords(paragraphVal);
     }
 };
 
 var unHighlightWords = function(paragraphVal){
-   // console.log('unhighlight');
-    //var paragraphVal = $('#paragraph').text();
-    //console.log('unhlight para val' + paragraphVal)
-   // $("#paragraph").text("");
-    $('#paragraph').text(paragraphVal);
+    console.log('unhighlight');
+    var removeA = new RegExp('<div class\="focus-word">', 'g');
+    var removeB = new RegExp('</div><!\-\- closing focus\-word \-\->', 'g');
+    if(typeof removeA != 'undefined'){
+        var newParagraphVala = paragraphVal.replace(removeA,"");
+        var newParagraphValb = newParagraphVala.replace(removeB, "");
+        console.log('newParagraphValb' + newParagraphValb);
+        $('#paragraph').html(newParagraphValb);
+    }
+    else {
+        $('#paragraph').html(paragraphVal);
+    }
+
 };
 
 // gather notes info
