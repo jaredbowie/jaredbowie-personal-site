@@ -117,7 +117,7 @@ var saveCard = function(){
   //      console.log(deckId);
         var allNoteNames = [];
         var oneCardObj = new Object();
-        oneCardObj['paragraph'] =  $('#paragraph').text();
+        oneCardObj['paragraph'] =  $('#paragraph').html();
         $('.one-note-group').children("textarea").each(function(){
             allNoteNames.push(this.value);
         });
@@ -232,7 +232,7 @@ var returnOneCard = function(cardId, deckId){
             cardid: cardId },
         success: function(r){
             var cardObject = jQuery.parseJSON(r);
-            $("#paragraph").text(cardObject["paragraph"]);
+            $("#paragraph").html(cardObject["paragraph"]);
             $('#audio-path').val(cardObject["audio-path"]);
             $("#font-color").val(cardObject["font-color"]);
             $(cardNameAreaInput).text(cardObject["paragraph"].substring(0,10));
