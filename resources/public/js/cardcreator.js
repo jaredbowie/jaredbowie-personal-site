@@ -1,5 +1,4 @@
 $(document).ready(function(){
- //   console.log(uniqueNumber());
     $('div.add-deck').click(function(){
         var deckName = prompt("Deck Name");
         if(deckName != null){
@@ -10,7 +9,6 @@ $(document).ready(function(){
                 data: {
                     deckname: deckName },
                 success: function(r){
-                    console.log(r);
                     location.reload();
                 }
             });
@@ -34,30 +32,23 @@ $(document).ready(function(){
         highlightWords();
     });
 
-    //$('#card-creator').on('focusout', '.notes-japanese-word', function(){
-     //   unHighlightWords();
-//    });
-
-    $('div.card-name').click(function(){
+    /*$('div.card-name').click(function(){
         console.log('add-card');
-    });
+    });*/
 
     $('#add-notes-button').click(function(){
-        //var test = $('div').find('#one-card-id');
         var cardId = $('#one-card-id').attr('cardid');
-        console.log(cardId);
+        //console.log(cardId);
         addOneNote();
     });
 
     $('#submit-button').click(function(){
         saveCard();
-        //$.post("card-creator", clojureMapToSend);
     });
 
 //click on deck display it's cards
     $('.deck-name').click(function(){
         var deckId = $(this).attr('id'); // grabs deckid from the deck div you click on
-      //  console.log(deckId);
         var deckDelete = ' <div class="delete-deck"><a href="#"><font class="para1">(</font><font class="functionbuiltin">Delete Deck</font><font class="para1">)</font></a></div>';
         var deckName = $(this).attr('deck-name');
         var deckNameAreaInput = $('div').find('#deck-name-area-input');
@@ -81,14 +72,13 @@ $(document).ready(function(){
                 deckid: deckIdToDelete },
             success: function(r){
                 location.reload();
-                console.log(r);
+              //  console.log(r);
             }
         });
     });
 
     //click on one card
     $('#cards-list').on("click", ".card-name", function(){
-        //console.log("hi");
         resetCard();
         var cardIdToUse = $(this).attr('id');
         $("#one-card-id").attr('cardid', cardIdToUse);
@@ -98,17 +88,14 @@ $(document).ready(function(){
      });
 
     $('#reset-button').click(function(){
-        //console.log(testVar);
         resetCard();
     });
 
     // remove notes
     $('#card-creator').on('click', "button[buttontype='delete-one-note-button']", function(){
-        //var theParents = $(this).closest('.one-note-group');
         var theNext = $(this).parent().parent();
-        //var theChildrens = theParents.closest('.one-note-group');
         theNext.remove();
-        console.log(theNext);
+//        console.log(theNext);
     });
 });
 
@@ -127,8 +114,7 @@ var saveCard = function(){
         alert("Must Select a Deck");
     }
     else {
-  //var deckId = $('#deck-name-area-input').attr();
-        console.log(deckId);
+  //      console.log(deckId);
         var allNoteNames = [];
         var oneCardObj = new Object();
         oneCardObj['paragraph'] =  $('#paragraph').text();
@@ -136,12 +122,11 @@ var saveCard = function(){
             allNoteNames.push(this.value);
         });
         oneCardObj['notes'] = groupThings(allNoteNames);
-        // console.log(oneCardObj.notes);
         oneCardObj['audio-path'] = $('#audio-path').val();
         oneCardObj['font-color'] = $('#font-color').val();
         var jsonStringToSend = JSON.stringify(oneCardObj);
-        console.log(jsonStringToSend);
-        console.log(cardId);
+       // console.log(jsonStringToSend);
+       // console.log(cardId);
         request = $.ajax({
              url: "card-creator/save-card",
              type: "post",
@@ -152,7 +137,7 @@ var saveCard = function(){
                  onecardmap: jsonStringToSend },
              success: function(r){
                  location.reload();
-                 console.log(r);
+             //    console.log(r);
              }
          });
     };
@@ -162,20 +147,16 @@ var saveCard = function(){
 var highlightWords = function(){
     var currentFocus = $(document.activeElement).filter(':focus');
     var currentFocusId = $(currentFocus).attr('id');
-    console.log('currentFocusId' + currentFocusId);
+//    console.log('currentFocusId' + currentFocusId);
     var notesJapaneseWord = $("textarea[id='" + currentFocusId + "']").val();
-    //console.log(notesJapaneseWord + '-focus jword');
           // basically just rest the form
-   // var paragraphVal = $('#paragraph').text();
     var paragraphVal = $('#paragraph').html();
     unHighlightWords(paragraphVal);
     var paragraphValUnHighlight = $('#paragraph').html();
-    // console.log();
-   // $("#paragraph").text("");
     // get the japanese word again
     // if japanese word isn't empty
-    console.log('paragraphval ' + paragraphValUnHighlight);
-    console.log('notesJapnaeword' + notesJapaneseWord);
+ //   console.log('paragraphval ' + paragraphValUnHighlight);
+ //   console.log('notesJapnaeword' + notesJapaneseWord);
     if (typeof notesJapaneseWord != 'undefined' && notesJapaneseWord != ''){
         $("#paragraph").html("");
         // take the current paragraph and make the focus-word the current japaense word
@@ -184,28 +165,23 @@ var highlightWords = function(){
         // regex to match all
         var notesJapaneseWordRegEx = new RegExp(notesJapaneseWord, 'g');
         var newParagraphVal = paragraphValUnHighlight.replace(notesJapaneseWordRegEx, newWordWithFontColor);
-      //  console.log('newparagraphval=' + newParagraphVal);
         // add the new text to the paragraph
-       // $('#paragraph').append(newParagraphVal);
-        console.log('newparaval' + newParagraphVal);
+   //     console.log('newparaval' + newParagraphVal);
         $('#paragraph').html(newParagraphVal);
-        //console.log(notesJapaneseWord);
     }
-    else {
-        console.log('else');
-         //$("#paragraph").html("");
-       // unHighlightWords(paragraphVal);
-    }
+   // else {
+       // console.log('else');
+  //  }
 };
 
 var unHighlightWords = function(paragraphVal){
-    console.log('unhighlight');
+  //  console.log('unhighlight');
     var removeA = new RegExp('<div class\="focus-word">', 'g');
     var removeB = new RegExp('</div><!\-\- closing focus\-word \-\->', 'g');
     if(typeof removeA != 'undefined'){
         var newParagraphVala = paragraphVal.replace(removeA,"");
         var newParagraphValb = newParagraphVala.replace(removeB, "");
-        console.log('newParagraphValb' + newParagraphValb);
+    //    console.log('newParagraphValb' + newParagraphValb);
         $('#paragraph').html(newParagraphValb);
     }
     else {
@@ -248,7 +224,6 @@ var returnCards = function(deckId){
 
 var returnOneCard = function(cardId, deckId){
     var cardNameAreaInput = $('div').find('#card-name-area-input');
-   // console.log('returneOneCard');
     request = $.ajax({
         url: "card-creator/return-one-card",
         type: "get",
@@ -267,7 +242,6 @@ var returnOneCard = function(cardId, deckId){
 };
 
 var resetCard = function(){
-        //console.log("hi");
     var cardNameAreaInput = $('div').find('#card-name-area-input');
     $(cardNameAreaInput).text("");
     $("#paragraph").text("");
@@ -297,8 +271,8 @@ var noteInsert = function(noteArray){
     var string2 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading">';
     var string3 = '</textarea><textarea placeholder="English" class="notes-english-explanation" name="english">';
     var string4 = '</textarea></div></div></div>';
-   // console.log(noteArray[0]["japanese"]);
     for (var i=0; i < noteArray.length; i++) {
+      //  console.log(noteArray[i]);
         $(string1 + noteArray[i]["japanese"] + string2 + noteArray[i]["english"] + string3 + noteArray[i]["reading"] + string4).insertAfter('#notes-section');
     }
 };
