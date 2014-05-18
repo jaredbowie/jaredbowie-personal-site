@@ -119,12 +119,14 @@ var saveCard = function(){
         var oneCardObj = new Object();
         oneCardObj['paragraph'] =  $('#paragraph').html();
         $('.one-note-group').children("textarea").each(function(){
-            allNoteNames.push(this.value);
+            allNoteNames.push(this.value); // correct
         });
-        oneCardObj['notes'] = groupThings(allNoteNames);
+       // console.log(allNoteNames);
+        oneCardObj['notes'] = groupThings(allNoteNames); // incorrect
         oneCardObj['audio-path'] = $('#audio-path').val();
         oneCardObj['font-color'] = $('#font-color').val();
         var jsonStringToSend = JSON.stringify(oneCardObj);
+        console.log('jsonStringToSend-', jsonStringToSend);
        // console.log(jsonStringToSend);
        // console.log(cardId);
         request = $.ajax({
@@ -191,22 +193,24 @@ var unHighlightWords = function(paragraphVal){
 };
 
 // gather notes info
+// this takes an array of strings and basically splits the array into 3s and then returns that
 var groupThings = function(allNoteNames){
     var theReading = "";
     var theWhole = [];
-    var tempObject = new Object();
     for (var i=0; i < allNoteNames.length; i+=3) {
+        var tempObject = new Object(); // store everything in an object for json purposes
         if (allNoteNames.length === 0) {
             theReading = "nil";
         }
         else {
             theReading = allNoteNames[i + 1];
             }
-        tempObject.japanese=allNoteNames[i];
-        tempObject.reading = theReading;
-        tempObject.english = allNoteNames[i + 2];
+        tempObject["japanese"] = allNoteNames[i];
+        tempObject["reading"] = theReading;
+        tempObject["english"] = allNoteNames[i + 2];
         theWhole.push(tempObject);
     }
+
     return theWhole;
 };
 
