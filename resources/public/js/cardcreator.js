@@ -291,3 +291,17 @@ var uniqueNumber = function(){
     var random = Math.floor(Math.random() * (max - min + 1)) + min;
     return random;
 };
+
+
+var exportDeck = function(){
+    var deckId = ""
+    request = $.ajax({
+            url: "card-creator/get-deck-tsv",
+            type: "get",
+            data: {
+            deckid: deckId },
+        success: function(r){
+            $("#font-cards-list").append(r);
+        }
+    });
+};

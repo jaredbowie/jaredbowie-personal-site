@@ -5,7 +5,7 @@
             [noir.util.route :refer [def-restricted-routes]]
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
-            [jaredbowiev2.models.cardcreator :as model-cc :refer [receive-card-from-post]]
+            [jaredbowiev2.models.cardcreator :as model-cc :refer [export-deck]]
             [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck add-empty-deck-to-user-coll-name delete-deck]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
@@ -94,7 +94,9 @@
        [:div {:class "left-label"} [:font {:class "string"} "\"Submit Button\" "]]
        [:div {:class "right-label"}
         [:button {:class "submit-reset-button" :id "submit-button" :type "button"} "Save Card"]
-        [:button {:class "submit-reset-button" :id "reset-button" :type "button"} "Reset Card"]]
+        [:button {:class "submit-reset-button" :id "reset-button" :type "button"} "Reset Card"]
+        [:button {:class "submit-reset-button" :id "export-button" :type "button"} "Export Deck"]
+        ]
        ]
       ]
      "")))
@@ -106,4 +108,5 @@
   (GET "/card-creator/return-one-card" [deckid cardid] (one-card-request (session/get :user) deckid cardid))
   (POST "/card-creator/new-deck" [deckname] (ccdb/add-empty-deck-to-user-coll-name "jared" deckname))
   (POST "/card-creator/delete-deck" [deckid] (ccdb/delete-deck (session/get :user) deckid))
+  (GET "/card-creator/get-deck-tsv" [deckid] (model-cc/export-deck (session/get :user) deckid))
   )
