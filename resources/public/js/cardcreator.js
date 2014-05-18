@@ -210,7 +210,6 @@ var groupThings = function(allNoteNames){
         tempObject["english"] = allNoteNames[i + 2];
         theWhole.push(tempObject);
     }
-
     return theWhole;
 };
 
@@ -271,6 +270,22 @@ var addOneNote = function(){
 //insert notes with the strings from an array
 // this is for editing cards when you have to place new notes in
 var noteInsert = function(noteArray){
+    var string1 = '<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" id="';
+    var string2 = '" name="word">';
+    var string3 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" id="';
+    var string4 = '" name="reading">';
+    var string5 = '</textarea><textarea placeholder="English" class="notes-english-explanation" id="';
+    var string6 = '" name="english">';
+    var string7 = '</textarea></div></div></div>';
+    for (var i=0; i < noteArray.length; i++) {
+        var uniqueId = uniqueNumber();
+        $(string1 + uniqueId + string2 + noteArray[i]["japanese"] + string3 + uniqueId + string4 + noteArray[i]["english"] + string5 + uniqueId + string6 + noteArray[i]["reading"] + string7).insertAfter('#notes-section');
+    }
+};
+
+
+/*
+var noteInsert = function(noteArray){
     var string1 = '<div class="one-input" class2="one-note-line"><div class="left-label"><button class="add-rem-button" type="button" buttontype="delete-one-note-button">Remove Note</button></div><div class="right-label"><div class="one-note-group"><textarea placeholder="Japanese Word" class="notes-japanese-word" name="word">';
     var string2 = '</textarea><textarea placeholder="Furigana" class="notes-furigana-word" name="reading">';
     var string3 = '</textarea><textarea placeholder="English" class="notes-english-explanation" name="english">';
@@ -280,6 +295,7 @@ var noteInsert = function(noteArray){
         $(string1 + noteArray[i]["japanese"] + string2 + noteArray[i]["english"] + string3 + noteArray[i]["reading"] + string4).insertAfter('#notes-section');
     }
 };
+*/
 
 var uniqueNumber = function(){
     var min = 100000000;
