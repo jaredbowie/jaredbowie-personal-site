@@ -1,4 +1,11 @@
 $(document).ready(function(){
+    $('#export-button').click(function(){
+        var deckId = $('#deck-name-area-input').attr('deckid');
+        if(typeof deckId != 'undefined') {
+            exportDeck(deckId);
+            }
+    });
+
     $('div.add-deck').click(function(){
         var deckName = prompt("Deck Name");
         if(deckName != null){
@@ -117,7 +124,9 @@ var saveCard = function(){
   //      console.log(deckId);
         var allNoteNames = [];
         var oneCardObj = new Object();
-        oneCardObj['paragraph'] =  $('#paragraph').html();
+        var paragraphWithHighlighting = $('#paragraph').html();
+        var paragraphNoHighlighting = unHighlightParagraph(paragraphWithHighlighting);
+        oneCardObj['paragraph'] = paragraphNoHighlighting;
         $('.one-note-group').children("textarea").each(function(){
             allNoteNames.push(this.value); // correct
         });
@@ -171,12 +180,17 @@ var highlightWords = function(){
    //     console.log('newparaval' + newParagraphVal);
         $('#paragraph').html(newParagraphVal);
     }
-   // else {
-       // console.log('else');
-  //  }
 };
 
+
+// for editing the on page html / css
 var unHighlightWords = function(paragraphVal){
+  var newParagraphVal = unHighlightParagraph(paragraphVal);
+    $('#paragraph').html(newParagraphVal);
+};
+
+// for unhlighting a string aka removing highlight divs
+var unHighlightParagraph = function(paragraphVal){
   //  console.log('unhighlight');
     var removeA = new RegExp('<div class\="focus-word">', 'g');
     var removeB = new RegExp('</div><!\-\- closing focus\-word \-\->', 'g');
@@ -184,13 +198,13 @@ var unHighlightWords = function(paragraphVal){
         var newParagraphVala = paragraphVal.replace(removeA,"");
         var newParagraphValb = newParagraphVala.replace(removeB, "");
     //    console.log('newParagraphValb' + newParagraphValb);
-        $('#paragraph').html(newParagraphValb);
+        return newParagraphValb;
     }
     else {
-        $('#paragraph').html(paragraphVal);
+        return paragraphVal;
     }
-
 };
+
 
 // gather notes info
 // this takes an array of strings and basically splits the array into 3s and then returns that
@@ -293,15 +307,15 @@ var uniqueNumber = function(){
 };
 
 
-var exportDeck = function(){
-    var deckId = ""
+var exportDeck = function(deckId){
+    console.log('exportDeck - deckId=', deckId);
     request = $.ajax({
             url: "card-creator/get-deck-tsv",
             type: "get",
             data: {
             deckid: deckId },
         success: function(r){
-            $("#font-cards-list").append(r);
+            console.log(r);
         }
     });
 };
