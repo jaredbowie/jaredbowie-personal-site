@@ -48,14 +48,27 @@ if highlight-boolean true make the word the font-color"
   "takes vector of note maps and one notes line to highlight
 produces string for notes section"
   [all-card-notes to-highlight-note font-color]
-  (apply str (for [one-note all-card-notes]
-               (if (= to-highlight-note one-note)
-                 (make-one-note-line one-note true font-color)
-                 (make-one-note-line one-note false font-color)
-                 )
-               )))
+  (let [all-notes-except-highlighted (apply str (for [one-note all-card-notes]
+                                                  (if (not= to-highlight-note one-note)
+                                                    (make-one-note-line one-note false font-color))))
+        highlighted-note-line (make-one-note-line to-highlight-note true font-color)
+        ]
+    (str highlighted-note-line all-notes-except-highlighted)
+    ))
+
+(defn- highlight-word-in-paragraph
+  "take a word and replace it in a paragraph with a colored word depending on font-color"
+  [paragraph word-to-highlight font-color]
+  (let [front-font (str "<font color=\"" font-color "\">")
+        back-font "</font>"
+        replacement-word-highlighted (str front-font word-to-highlight back-font)
+        ]
+    (clojure.string/replace paragraph (re-pattern word-to-highlight) replacement-word-highlighted)
+    )
+  )
 
 (defn- one-map-to-tsv
+  "takes entire deck map and returns tsv of cards"
   [map-of-deck]
   (let [all-cards (map-of-deck :cards)]
     (for [one-card all-cards]
@@ -63,7 +76,11 @@ produces string for notes section"
             font-color (one-card :font-color)
             ]
         (for [one-note all-notes-one-card]
-          (make-notes-string all-notes-one-card one-note font-color)
+          (let [paragraph (highlight-word-in-paragraph (one-card :paragraph) (one-note :japanese) font-color)
+                audio-path (one-card :audio-path)
+                notes (make-notes-string all-notes-one-card one-note font-color)]
+            (str paragraph "\t" audio-path "\t" notes "\r")
+            )
           )
         )
       )
@@ -71,7 +88,7 @@ produces string for notes section"
   )
 
 (defn- test-one-map-to-tsv []
-  (one-map-to-tsv (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0"))
+  (spit "test.txt" (apply str (first (one-map-to-tsv (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0")))))
   ; (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0")
   )
 
