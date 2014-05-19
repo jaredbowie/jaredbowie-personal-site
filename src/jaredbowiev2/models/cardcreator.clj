@@ -20,26 +20,80 @@
                                         ;-export all cards to a TSV
 
 
-(defn export-deck [user-coll-name deckid]
-                                        ;get deck from db
-                                        ;process deck
-  (println (ccdb/display-all-cards-in-deck user-coll-name deckid))
-  (ccdb/display-all-cards-in-deck user-coll-name deckid)
+(declare export-deck)
+(declare one-map-to-tsv)
+(declare make-one-note-line)
+(declare make-notes-string)
 
+(defn- make-one-note-line
+  "takes one note map and produces string for notes section
+if highlight-boolean true make the word the font-color"
+  [one-note highlight-boolean font-color]
+  (let [japanese-pre (one-note :japanese)
+        japanese (if (true? highlight-boolean)
+                   (str "<font color=\"" font-color "\">" japanese-pre "</font>")
+                   japanese-pre
+                   )
+        reading-pre (one-note :reading)
+        reading (if (not= "" reading-pre)
+                  (str "[" reading-pre "]")
+                  reading-pre
+                  )
+        english (one-note :english)]
+    (str "<div>" japanese reading "=" english "</div>")
+    )
   )
+
+(defn- make-notes-string
+  "takes vector of note maps and one notes line to highlight
+produces string for notes section"
+  [all-card-notes to-highlight-note font-color]
+  (apply str (for [one-note all-card-notes]
+               (if (= to-highlight-note one-note)
+                 (make-one-note-line one-note true font-color)
+                 (make-one-note-line one-note false font-color)
+                 )
+               )))
 
 (defn- one-map-to-tsv
-  [one-map]
-  (let [char-seperator "\t"]
-    (str (one-map :paragraph) char-seperator (one-map :reading-paragraph) char-seperator (one-map :notes) char-seperator (one-map :audio) "\r"))
+  [map-of-deck]
+  (let [all-cards (map-of-deck :cards)]
+    (for [one-card all-cards]
+      (let [all-notes-one-card (one-card :notes)
+            font-color (one-card :font-color)
+            ]
+        (for [one-note all-notes-one-card]
+          (make-notes-string all-notes-one-card one-note font-color)
+          )
+        )
+      )
+    )
   )
 
-#_(comment (defn all-maps-to-tsv [db-name coll-name]
-           (let [all-cards (view-all-cards-in-db-coll db-name coll-name)]
-             (spit "tempcards.txt" (apply str (map #(one-map-to-tsv %) all-cards)))
-             (apply str (map #(one-map-to-tsv %) all-cards))
-             )
-           ))
+(defn- test-one-map-to-tsv []
+  (one-map-to-tsv (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0"))
+  ; (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0")
+  )
+
+(defn export-deck
+  "main function taking entire deck and producing a tsv file for anki import"
+  [user-coll-name deckid]
+  (println (ccdb/display-all-cards-in-deck user-coll-name deckid))
+  (let [one-deck (ccdb/display-all-cards-in-deck user-coll-name deckid)]
+    (for [one-card-map one-deck]
+      (one-map-to-tsv one-card-map)
+      )
+    )
+  )
+
+(defn- test-notes-format []
+  (let [whole-map (first ((ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0") :cards))]
+    (make-notes-string (whole-map :notes))
+    ))
+
+(defn- test-export-deck []
+  (export-deck "jared" "53783afc31daa6e263c91ac0"))
+
 
 (defn- how-things-should-look []
   (slurp "/home/jared/clojureprojects/jaredbowie/jpdpartial")
@@ -70,17 +124,6 @@ highlighting must be a string like \"#0000ff\""
     ;new-paragraph
     )
   )
-
-(defn- make-one-note-line
-  "returns a string of one line.  inserts furigana if it exists."
-  [word translation reading]
-  (if (nil? reading)
-                        (str word "=" translation)
-                        (str word "[" reading "]" "=" translation)))
-
-(defn- all-notes-except-one [all-notes one-note]
-  (let [without-note (filter #(not= one-note %) all-notes)]
-    (apply str (map #(str (make-one-note-line (% :word) (% :translation) (% :reading)) "<br>") without-note))))
 
 
 (defn- make-one-card-map [paragraph reading-paragraph highlighting-color one-note audio-path all-notes]
