@@ -40,8 +40,8 @@ $(document).ready(function(){
     });
 
     /*$('div.card-name').click(function(){
-        console.log('add-card');
-    });*/
+console.log('add-card');
+});*/
 
     $('#add-notes-button').click(function(){
         var cardId = $('#one-card-id').attr('cardid');
@@ -79,7 +79,7 @@ $(document).ready(function(){
                 deckid: deckIdToDelete },
             success: function(r){
                 location.reload();
-              //  console.log(r);
+              // console.log(r);
             }
         });
     });
@@ -102,7 +102,7 @@ $(document).ready(function(){
     $('#card-creator').on('click', "button[buttontype='delete-one-note-button']", function(){
         var theNext = $(this).parent().parent();
         theNext.remove();
-//        console.log(theNext);
+// console.log(theNext);
     });
 });
 
@@ -115,13 +115,13 @@ var saveCard = function(){
     var cardId = $('#one-card-id').attr('cardid');
     if(typeof cardId === 'undefined'){
         var cardId = false;
-    };
+    }
     var deckId = deckIdExists();
     if(typeof deckId === 'undefined'){
         alert("Must Select a Deck");
     }
     else {
-  //      console.log(deckId);
+  // console.log(deckId);
         var allNoteNames = [];
         var oneCardObj = new Object();
         var paragraphWithHighlighting = $('#paragraph').html();
@@ -145,20 +145,21 @@ var saveCard = function(){
              data: {
                  cardid: cardId,
                  deckid: deckId,
-                 onecardmap: jsonStringToSend },
+                 onecardmap: jsonStringToSend
+             },
              success: function(r){
                  location.reload();
-             //    console.log(r);
+             // console.log(r);
              }
-         });
-    };
+        });
+    }
 };
 
 
 var highlightWords = function(){
     var currentFocus = $(document.activeElement).filter(':focus');
     var currentFocusId = $(currentFocus).attr('id');
-//    console.log('currentFocusId' + currentFocusId);
+// console.log('currentFocusId' + currentFocusId);
     var notesJapaneseWord = $("textarea[id='" + currentFocusId + "']").val();
           // basically just rest the form
     var paragraphVal = $('#paragraph').html();
@@ -166,8 +167,8 @@ var highlightWords = function(){
     var paragraphValUnHighlight = $('#paragraph').html();
     // get the japanese word again
     // if japanese word isn't empty
- //   console.log('paragraphval ' + paragraphValUnHighlight);
- //   console.log('notesJapnaeword' + notesJapaneseWord);
+ // console.log('paragraphval ' + paragraphValUnHighlight);
+ // console.log('notesJapnaeword' + notesJapaneseWord);
     if (typeof notesJapaneseWord != 'undefined' && notesJapaneseWord != ''){
         $("#paragraph").html("");
         // take the current paragraph and make the focus-word the current japaense word
@@ -177,7 +178,7 @@ var highlightWords = function(){
         var notesJapaneseWordRegEx = new RegExp(notesJapaneseWord, 'g');
         var newParagraphVal = paragraphValUnHighlight.replace(notesJapaneseWordRegEx, newWordWithFontColor);
         // add the new text to the paragraph
-   //     console.log('newparaval' + newParagraphVal);
+   // console.log('newparaval' + newParagraphVal);
         $('#paragraph').html(newParagraphVal);
     }
 };
@@ -191,13 +192,13 @@ var unHighlightWords = function(paragraphVal){
 
 // for unhlighting a string aka removing highlight divs
 var unHighlightParagraph = function(paragraphVal){
-  //  console.log('unhighlight');
+  // console.log('unhighlight');
     var removeA = new RegExp('<div class\="focus-word">', 'g');
     var removeB = new RegExp('</div><!\-\- closing focus\-word \-\->', 'g');
     if(typeof removeA != 'undefined'){
         var newParagraphVala = paragraphVal.replace(removeA,"");
         var newParagraphValb = newParagraphVala.replace(removeB, "");
-    //    console.log('newParagraphValb' + newParagraphValb);
+    // console.log('newParagraphValb' + newParagraphValb);
         return newParagraphValb;
     }
     else {
@@ -300,7 +301,7 @@ var noteInsert = function(noteArray){
 
 var uniqueNumber = function(){
     var min = 100000000;
-    var max = 999999999;;
+    var max = 999999999;
     // and the formula is:
     var random = Math.floor(Math.random() * (max - min + 1)) + min;
     return random;
@@ -316,6 +317,12 @@ var exportDeck = function(deckId){
             deckid: deckId },
         success: function(r){
             console.log(r);
+            var aFileParts =[r];
+            console.log(aFileParts);
+            var oMyBlob = new Blob(aFileParts, {encoding:"UTF-8",type:"text/plain;charset=UTF-8"}); // the blob
+            var url = URL.createObjectURL(oMyBlob);
+            window.open(url,"_blank","");
+//window.location.assign(url);
         }
     });
 };

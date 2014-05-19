@@ -95,12 +95,7 @@ produces string for notes section"
 (defn export-deck
   "main function taking entire deck and producing a tsv file for anki import"
   [user-coll-name deckid]
-  (println (ccdb/display-all-cards-in-deck user-coll-name deckid))
-  (let [one-deck (ccdb/display-all-cards-in-deck user-coll-name deckid)]
-    (for [one-card-map one-deck]
-      (one-map-to-tsv one-card-map)
-      )
-    )
+  (apply str (first (one-map-to-tsv (ccdb/display-all-cards-in-deck user-coll-name deckid))))
   )
 
 (defn- test-notes-format []
