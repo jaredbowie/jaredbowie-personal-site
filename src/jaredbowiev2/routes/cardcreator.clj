@@ -24,8 +24,10 @@
   )
 
 (defn one-card-link [one-card-map deck-id]
+
+  ;take 15 drop 5 which may be <div>
   (html
-   [:div {:class "card-name" :id (one-card-map :_id) :deck deck-id} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "card"] " " [:font {:class "string"} "\""(take 10 (one-card-map :paragraph)) "\""] [:font {:class "para1"} ")"]]])
+   [:div {:class "card-name" :id (one-card-map :_id) :deck deck-id} [:a {:href "#"} [:font {:class "para1"} "("] [:font {:class "functionbuiltin"} "card"] " " [:font {:class "string"} "\"" (drop 5 (take 15 (one-card-map :paragraph))) "\""] [:font {:class "para1"} ")"]]])
   )
 
 (defn card-links [user-coll-name deck-id]

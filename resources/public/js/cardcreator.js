@@ -262,7 +262,7 @@ var returnOneCard = function(cardId, deckId){
             $("#paragraph").html(cardObject["paragraph"]);
             $('#audio-path').val(cardObject["audio-path"]);
             $("#font-color").val(cardObject["font-color"]);
-            $(cardNameAreaInput).text(cardObject["paragraph"].substring(0,10));
+            $(cardNameAreaInput).text(cardObject["paragraph"].substring(5,10)); // minor hack to remove <div>
             noteInsert(cardObject["notes"]);
         }
     });
