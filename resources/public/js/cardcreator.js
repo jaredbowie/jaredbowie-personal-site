@@ -3,6 +3,7 @@ $(document).ready(function(){
         var deckId = $('#deck-name-area-input').attr('deckid');
         if(typeof deckId != 'undefined') {
             exportDeck(deckId);
+            exportSoundDeck(deckId);
             }
     });
 
@@ -331,6 +332,24 @@ var exportDeck = function(deckId){
             var oMyBlob = new Blob(aFileParts, {encoding:"UTF-8",type:"text/plain;charset=UTF-8"}); // the blob
             var url = URL.createObjectURL(oMyBlob);
             window.open(url,"_blank","");
+//window.location.assign(url);
+        }
+    });
+};
+
+var exportSoundDeck = function(deckId){
+    request = $.ajax({
+            url: "card-creator/get-deck-tsv-listening",
+            type: "get",
+            data: {
+            deckid: deckId },
+        success: function(r){
+            console.log(r);
+            var aFileParts =[r];
+            console.log(aFileParts);
+            var oMyBlob = new Blob(aFileParts, {encoding:"UTF-8",type:"text/plain;charset=UTF-8"}); // the blob
+            var url = URL.createObjectURL(oMyBlob);
+            window.open(url,"_blank2","");
 //window.location.assign(url);
         }
     });

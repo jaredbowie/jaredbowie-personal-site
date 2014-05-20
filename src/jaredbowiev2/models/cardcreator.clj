@@ -45,7 +45,7 @@ if highlight-boolean true make the word the font-color"
   )
 
 (defn- make-notes-string
-  "takes vector of note maps and one notes line to highlight
+  "takes vector of note maps and one note's line to highlight
 produces string for notes section"
   [all-card-notes to-highlight-note font-color]
   (let [all-notes-except-highlighted (apply str (for [one-note all-card-notes]
@@ -53,7 +53,10 @@ produces string for notes section"
                                                     (make-one-note-line one-note false font-color))))
         highlighted-note-line (make-one-note-line to-highlight-note true font-color)
         ]
-    (str highlighted-note-line all-notes-except-highlighted)
+    (if (not= highlighted-note-line "<div><font color=\"\"></font>=</div>")
+      (str highlighted-note-line all-notes-except-highlighted)
+      (str all-notes-except-highlighted)
+      )
     ))
 
 (defn- highlight-word-in-paragraph
@@ -79,7 +82,7 @@ produces string for notes section"
           (let [paragraph (highlight-word-in-paragraph (one-card :paragraph) (one-note :japanese) font-color)
                 audio-path (one-card :audio-path)
                 notes (make-notes-string all-notes-one-card one-note font-color)]
-            (str paragraph "\t" audio-path "\t" notes "\r")
+            (str paragraph "\t" "[sound:" audio-path "]" "\t" notes "\r")
             )
           )
         )
@@ -87,75 +90,48 @@ produces string for notes section"
     )
   )
 
-(defn- test-one-map-to-tsv []
-  (spit "test.txt" (apply str (first (one-map-to-tsv (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0")))))
-  ; (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0")
+(defn sound-cards-export
+  "takes a user-coll-name and deckid as a string and makes a listening card for each"
+  [user-coll-name deckid]
+  (let [all-card-maps (ccdb/display-all-cards-in-deck user-coll-name deckid)
+        all-cards (all-card-maps :cards)
+        font-color (all-card-maps :font-color)]
+    (for [one-card all-cards]
+      (let [paragraph (one-card :paragraph)
+            audio-path (one-card :audio-path)
+            notes (make-notes-string (one-card :notes) {:japanese "" :english "" :reading ""} font-color)
+            ]
+               (str paragraph "\t" "[sound:" audio-path "]" "\t" notes "\r")
+        )
+      )
+    )
+  )
+
+(defn- test-sound-cards-export []
+  (sound-cards-export "jared" "53783afc31daa6e263c91ac0")
   )
 
 (defn export-deck
   "main function taking entire deck and producing a tsv file for anki import"
   [user-coll-name deckid]
-  (apply str (first (one-map-to-tsv (ccdb/display-all-cards-in-deck user-coll-name deckid))))
+  (let [all-maps (one-map-to-tsv (ccdb/display-all-cards-in-deck user-coll-name deckid))]
+    (apply str (for [one-map all-maps]
+                 (apply str one-map)
+                 ))
+    )
+  )
+
+
+
+(defn- test-one-map-to-tsv []
+  (let [all-maps (one-map-to-tsv (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0"))]
+    ;(clojure.pprint/pprint all-maps)
+    (first all-maps)
+    )
+  ; (ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0")
   )
 
 (defn- test-notes-format []
   (let [whole-map (first ((ccdb/display-all-cards-in-deck "jared" "53783afc31daa6e263c91ac0") :cards))]
     (make-notes-string (whole-map :notes))
     ))
-
-(defn- test-export-deck []
-  (export-deck "jared" "53783afc31daa6e263c91ac0"))
-
-
-(defn- how-things-should-look []
-  (slurp "/home/jared/clojureprojects/jaredbowie/jpdpartial")
- )
-
-(defn- highlight-word
-  "takes a word and a highlighting color, then bolds it and colors it
-highlighting must be a string like \"#0000ff\""
-  [word highlighting]
-  (str "<font color=\"" highlighting "\"><b>" word "</b></font>")
-)
-
-(defn- make-reading-paragraph [paragraph all-notes]
-  (loop [new-paragraph paragraph
-         note-collection all-notes]
-    (if (not (empty? note-collection))
-      (do
-        (let [the-word ((first note-collection) :word)
-              the-reading ((first note-collection) :reading)
-              to-replace (if (not (nil? the-reading))
-                           (str the-word "[" the-reading "]")
-                           the-word
-                           )
-              ]
-          (recur (clojure.string/replace new-paragraph (re-pattern the-word) to-replace) (drop 1 note-collection))))
-        new-paragraph
-      )
-    ;new-paragraph
-    )
-  )
-
-
-(defn- make-one-card-map [paragraph reading-paragraph highlighting-color one-note audio-path all-notes]
-  (let [one-note-line (make-one-note-line (one-note :word) (one-note :translation) (one-note :reading)) ]
-    (hash-map :paragraph
-              (clojure.string/replace paragraph (re-pattern (one-note :word)) (highlight-word (one-note :word) highlighting-color))
-              :reading-paragraph reading-paragraph
-              :notes (str (highlight-word one-note-line highlighting-color) "<p>"
-                          (all-notes-except-one all-notes one-note))
-              :audio audio-path))
-  )
-
-
-
-(defn- test-make-reading-paragraph []
-  (make-reading-paragraph "よし: 今日何しますか。\n\nたけ: 今日？天気を見てください！いよいよ夏が来ました。晴れで、暑くて、夏本番ですよ！今日は海に行きます。\n\nよし: 海ですか。あまり行きたくないです。"
-                        [{:word "天気を見てください" :reading nil :translation "Please look at the weather."}
-         {:word "いよいよ" :reading nil :translation "Finally, more and more"}
-         {:word "晴れ" :reading "はれ" :translation "clear weather"}
-         {:word "夏本番" :reading "なつほんばん" :translation "midsummer; height of summer"}
-         {:word "あまり" :reading nil :translation "not much"}]
-                          )
-  )

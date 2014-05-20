@@ -5,7 +5,7 @@
             [noir.util.route :refer [def-restricted-routes]]
             [hiccup.element :refer [javascript-tag]]
             [hiccup.page :refer [include-js include-css]]
-            [jaredbowiev2.models.cardcreator :as model-cc :refer [export-deck]]
+            [jaredbowiev2.models.cardcreator :as model-cc :refer [export-deck sound-cards-export]]
             [jaredbowiev2.models.cardcreatoredb :as ccdb :refer [display-all-decks-in-user-coll-with-id display-all-cards-in-deck user-coll-has-decks? display-all-cards-in-deck-object-as-string view-card-by-string-id-json add-card-to-deck add-empty-deck-to-user-coll-name delete-deck]]
             [noir.session :as session]
             [hiccup.core :refer [html]]
@@ -111,4 +111,5 @@
   (POST "/card-creator/new-deck" [deckname] (ccdb/add-empty-deck-to-user-coll-name "jared" deckname))
   (POST "/card-creator/delete-deck" [deckid] (ccdb/delete-deck (session/get :user) deckid))
   (GET "/card-creator/get-deck-tsv" [deckid] (model-cc/export-deck (session/get :user) deckid))
+  (GET "/card-creator/get-deck-tsv-listening" [deckid] (model-cc/sound-cards-export (session/get :user) deckid))
   )
