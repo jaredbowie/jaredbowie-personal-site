@@ -35,7 +35,16 @@ $(document).ready(function(){
         });
 
 /// making words highlight as they're written
-    $('#card-creator').on('click', function(){
+// making one for all three notes types so it hopefully doesn't focus away when trying to select text in paragraph
+    $('#card-creator').on('click', '.notes-japanese-word', function(){
+        highlightWords();
+    });
+
+    $('#card-creator').on('click', '.notes-furigana-word', function(){
+        highlightWords();
+    });
+
+      $('#card-creator').on('click', '.notes-english-explanation', function(){
         highlightWords();
     });
 
