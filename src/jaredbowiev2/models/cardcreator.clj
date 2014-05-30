@@ -90,20 +90,21 @@ produces string for notes section"
     )
   )
 
+
 (defn sound-cards-export
   "takes a user-coll-name and deckid as a string and makes a listening card for each"
   [user-coll-name deckid]
   (let [all-card-maps (ccdb/display-all-cards-in-deck user-coll-name deckid)
         all-cards (all-card-maps :cards)
         font-color (all-card-maps :font-color)]
-    (for [one-card all-cards]
-      (let [paragraph (one-card :paragraph)
-            audio-path (one-card :audio-path)
-            notes (make-notes-string (one-card :notes) {:japanese "" :english "" :reading ""} font-color)
-            ]
-               (str paragraph "\t" "[sound:" audio-path "]" "\t" notes "\r")
-        )
-      )
+    (apply str (for [one-card all-cards]
+                 (let [paragraph (one-card :paragraph)
+                       audio-path (one-card :audio-path)
+                       notes (make-notes-string (one-card :notes) {:japanese "" :english "" :reading ""} font-color)
+                       ]
+                   (str paragraph "\t" "[sound:" audio-path "]" "\t" notes "\r")
+                   )
+                 ))
     )
   )
 
@@ -121,6 +122,10 @@ produces string for notes section"
     )
   )
 
+
+(defn- test-export-deck []
+  (export-deck "jared" "53783afc31daa6e263c91ac0")
+  )
 
 
 (defn- test-one-map-to-tsv []

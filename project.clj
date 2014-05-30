@@ -1,4 +1,4 @@
-(defproject jaredbowiev2 "0.1.5-SNAPSHOT"
+(defproject jaredbowiev2 "0.1.7"
   :description "Jared Bowie's Personal site"
   :url "http://jaredbowie.com/"
   :dependencies [[org.clojure/clojure "1.6.0"]
